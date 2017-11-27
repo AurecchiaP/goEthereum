@@ -1,7 +1,7 @@
 {
-  "name": "pet-shop",
-  "version": "1.0.0",
-  "description": "",
+  "name": "go-ethereum",
+  "version": "0.0.1",
+  "description": "A simple go application that uses smart contracts",
   "main": "truffle.js",
   "directories": {
     "test": "test"
