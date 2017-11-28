@@ -50,3 +50,21 @@ contract Go {
 
 
 }
+
+contract Gos {
+  address public owner;
+  Go[] public games;
+
+
+  modifier ownerRestricted() {
+    if (msg.sender == owner) _;
+  }
+
+  function Gos() public {
+    owner = msg.sender;
+  }
+
+  function addGame(Go game) public {
+      games.push(game);
+  }
+}

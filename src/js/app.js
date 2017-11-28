@@ -64,6 +64,7 @@ App = {
 
         return adoptionInstance.getAdopters.call();
       }).then(function(adopters) {
+          console.log(adopters);
         for (i = 0; i < adopters.length; i++) {
           // if (adopters[i] !== '0x') {
           //   $('.panel-pet').eq(i).find('button').text('Success').attr('disabled', true);
