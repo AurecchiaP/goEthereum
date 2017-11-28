@@ -1,5 +1,6 @@
 // create an empty array for the board 19x19
 let board = [];
+var turns = 0;
 
 for (var i = 0; i < 19*19; i++) {
     board[i] = 0;
@@ -15,6 +16,8 @@ for (var i = 0; i < 19; i++) {
         button.attr("id", i*19 + j);
         button.on('click', this, function() {
             console.log(this.id);
+            turns++;
+            board[i*19 + j] = turns%2;
         });
     boardDiv.append( button );
 }

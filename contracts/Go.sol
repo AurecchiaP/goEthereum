@@ -5,7 +5,7 @@ contract Go {
   address public player2;
 
   struct Game {
-      byte[] board;
+      byte[361] board;
       byte state;
       byte turn;
   }
@@ -24,6 +24,7 @@ contract Go {
     owner = msg.sender;
   }
 
+
   function move(uint pos) public {
       // assert move is right
 
@@ -36,4 +37,16 @@ contract Go {
       // board has to be updated. where/how we do this?
 
   }
+
+  function getBoard()public returns (byte[361]) {
+    return game.board;
+  }
+
+  function setVariable(uint pos)public{
+    if(pos < 362){
+      game.board[pos] = 1;
+
+  }
+
+
 }
