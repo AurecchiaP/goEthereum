@@ -1,0 +1,17 @@
+
+#board2 {
+    background: url(../images/board.svg) no-repeat top left;
+    background-size: contain;
+    width: 50vw;
+    height: 50vh;
+}
+
+
+#stone {
+    background: url(../images/white.svg) no-repeat top left;
+    background-size: contain;
+    width: 3vw;
+    height: 3vh;
+    position: relative;
+    display: none;
+}
