@@ -46,9 +46,8 @@ contract Go {
     if(pos < 362){
       game.board[pos] = 1;
 
+    }
   }
-
-
 }
 
 contract Gos {

@@ -1,17 +1,20 @@
 
-#board2 {
+#board {
     background: url(../images/board.svg) no-repeat top left;
     background-size: contain;
+    position: relative;
     width: 50vw;
     height: 50vh;
 }
 
-
-#stone {
+.stone {
     background: url(../images/white.svg) no-repeat top left;
     background-size: contain;
-    width: 3vw;
-    height: 3vh;
-    position: relative;
+    width: 2.7vw;
+    height: 2.7vh;
+}
+
+#hoverStone, #placedStone {
+    position: absolute;
     display: none;
 }

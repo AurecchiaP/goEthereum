@@ -1,39 +1,31 @@
+
+// stone class
+class Stone {
+    constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+    }
+}
+
 // create an empty array for the board 19x19
 let board = [];
-let turns = 0;
 
 for (let i = 0; i < 19*19; i++) {
     board[i] = 0;
 }
 
-// get the div defined in index.html
-let boardDiv = $('#board');
+var boardDiv = $('#board');
 
-// create 361 buttons and add them to the div
-for (let i = 0; i < 19; i++) {
-    for (let j = 0; j < 19; j++) {
-        let button = $('<button></button>');
-        button.attr("id", i*19 + j);
-        button.on('click', this, function() {
-            console.log(this.id);
-            turns++;
-            board[i*19 + j] = turns%2;
-        });
-    boardDiv.append( button );
-}
-boardDiv.append( "<br>" );
-}
+var placedStone = new Stone(0,0,'white');
 
-let boardDiv2 = $('#board2');
-var stone = $('#stone');
-
-let x,y;
-boardDiv2.on('mousemove', this, function() {
+// when the cursor hovers the board, show where the stone would be placed
+boardDiv.on('mousemove', this, function() {
     // relative position of the board
     let offset = $(this).offset();
     // find the cursor position relative to the board
-    x = event.pageX - offset.left;
-    y = event.pageY - offset.top;
+    let x = event.pageX - offset.left;
+    let y = event.pageY - offset.top;
     // width (and height) of the board
     let w = this.clientWidth;
     let cellWidth = w/19;
@@ -41,10 +33,42 @@ boardDiv2.on('mousemove', this, function() {
     let cellY = Math.floor(19*y/w);
 
     if(cellX < 19 && cellY < 19) {
-        stone.css({
+        $('#hoverStone').css({
             display: 'block',
             top: cellY * cellWidth + 'px',
             left: cellX * cellWidth + 'px'
-        })
+        });
+    }
+});
+
+// when the cursor leaves the board, hide the stone
+boardDiv.on('mouseleave', this, function() {
+    $('#hoverStone').css({
+        display: 'none'
+    });
+});
+
+// when we click the board, put a stone on the selected intersection
+boardDiv.on('click', this, function() {
+    // relative position of the board
+    let offset = $(this).offset();
+    // find the cursor position relative to the board
+    let x = event.pageX - offset.left;
+    let y = event.pageY - offset.top;
+    // width (and height) of the board
+    let w = this.clientWidth;
+    let cellWidth = w/19;
+    let cellX = Math.floor(19*x/w);
+    let cellY = Math.floor(19*y/w);
+
+    if(cellX < 19 && cellY < 19) {
+        $('#placedStone').css({
+            display: 'block',
+            top: cellY * cellWidth + 'px',
+            left: cellX * cellWidth + 'px'
+        });
+        placedStone.x = cellX;
+        placedStone.y = cellY;
+        console.log("placed stone: ", placedStone.x, placedStone.y);
     }
 });
