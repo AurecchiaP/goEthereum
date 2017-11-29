@@ -4,17 +4,32 @@
     background-size: contain;
     position: relative;
     width: 50vw;
-    height: 50vh;
+    height: 50vw;
+    margin: auto;
+    margin-top: 1em;
+    /*padding-bottom: 0;*/
 }
 
 .stone {
-    background: url(../images/white.svg) no-repeat top left;
-    background-size: contain;
+    position: absolute;
     width: 2.7vw;
     height: 2.7vh;
 }
 
+.white {
+  background: url(../images/white.svg) no-repeat top left;
+  background-size: contain;
+}
+
+.black {
+  background: url(../images/black.svg) no-repeat top left;
+  background-size: contain;
+}
+
 #hoverStone, #placedStone {
-    position: absolute;
     display: none;
+}
+
+#gamesList {
+    padding: 1em;
 }
