@@ -5,11 +5,12 @@
   width: 50vw;
   height: 50vw;
   padding: 0;
-  margin: 0;
+  margin: 1em;
 }
 
 .centerContent {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100vh;
@@ -18,15 +19,20 @@
 
 .stone {
   position: absolute;
-  width: 2.7vw;
-  height: 2.7vh;
+  width: 2.63vw;
+  height: 2.63vw;
+  padding: 0;
+  margin: 0;
+  transition: all .2s;
 }
 
+/* white stones (set background image) */
 .white {
   background: url(../images/white.svg) no-repeat top left;
   background-size: contain;
 }
 
+/* black stones (set background image) */
 .black {
   background: url(../images/black.svg) no-repeat top left;
   background-size: contain;
@@ -38,4 +44,21 @@
 
 #gamesList {
   padding: 1em;
+}
+
+/* navbar */
+.navbarStyle {
+  padding: .5em 0 0 .5em;
+  background-color: #232529;
+}
+
+/* non-active tabs */
+.nav-item a {
+  color: #EBEAE7;
+  transition: all .2s;
+}
+
+/* active tab */
+.nav-item a.active {
+  background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 100%); !important;
 }

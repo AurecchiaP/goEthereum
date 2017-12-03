@@ -70,8 +70,8 @@ boardDiv.on('mousemove', this, function() {
   if (cellX < 19 && cellY < 19) {
     $('#hoverStone').css({
       display: 'block',
-      top: cellY * board.cellWidth + 'px',
-      left: cellX * board.cellWidth + 'px'
+      top: cellY/19 * 100 + '%',
+      left: cellX/19 * 100 + '%'
     });
   }
 });
@@ -104,12 +104,11 @@ boardDiv.on('click', this, function() {
       placedStone.x = -1;
       placedStone.y = -1;
       $('#moveButton').prop('disabled', true);
-      console.log("removed stone");
     } else {
       $('#placedStone').css({
         display: 'block',
-        top: cellY * board.cellWidth + 'px',
-        left: cellX * board.cellWidth + 'px'
+        top: cellY/19 * 100 + '%',
+        left: cellX/19 * 100 + '%'
       });
       placedStone.x = cellX;
       placedStone.y = cellY;
