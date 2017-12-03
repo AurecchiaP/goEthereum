@@ -21,38 +21,67 @@
 </head>
 
 <body>
-  <nav class="navbar navbar-dark bg-dark">
-    <a class="navbar-brand" href="#">
-      <img src="/images/white.svg" width="30" height="30" alt="">
-    </a>
-    <button type="button" class="btn btn-primary">Primary</button>
-    <button type="button" class="btn btn-light">Light</button>
 
-  </nav>
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" data-toggle="tab" href="#home" role="tab">Home</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" href="#profile" role="tab">Game</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" href="#messages" role="tab">New game</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" href="#settings" role="tab">list of games</a>
+    </li>
+  </ul>
 
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <!-- ---------------------------- HOME -------------------------------- -->
+    <div class="tab-pane active" id="home" role="tabpanel">
+      <div class="container centerContent">
+        Welcome to goEthereum
+      </div>
+    </div>
 
-  <div class="container">
+    <!-- ---------------------------- GAME -------------------------------- -->
+    <div class="tab-pane" id="profile" role="tabpanel">
+      <div class="container centerContent">
+        <div id="board">
+          <div id="hoverStone" class="stone white"></div>
+          <div id="placedStone" class="stone black"></div>
+          <!-- FILLED IN BY UTIL.JS -->
+        </div>
+        <input id="moveButton" class="btn btn-primary" disabled type="button" value="Confirm move">
+      </div>
+    </div>
 
-    <div id="board">
-      <div id="hoverStone" class="stone white"></div>
-      <div id="placedStone" class="stone black"></div>
-      <!-- FILLED IN BY UTIL.JS -->
+    <!-- -------------------------- NEW GAME ------------------------------ -->
+    <div class="tab-pane" id="messages" role="tabpanel">
+      <div class="container centerContent">
+        create a new game
+      </div>
+    </div>
+
+    <!-- -------------------------- GAMES LIST ---------------------------- -->
+    <div class="tab-pane" id="settings" role="tabpanel">
+      <div class="container centerContent">
+        <p>maybe distinguish between games with only one player and my games</p>
+        <div id="gamesList">
+          <ul class="list-group">
+            <li class="list-group-item">game1</li>
+            <li class="list-group-item">game2</li>
+            <li class="list-group-item">game3</li>
+            <li class="list-group-item">game4</li>
+            <li class="list-group-item">game5</li>
+          </ul>
+        </div>
+      </div>
     </div>
 
   </div>
-
-<!--
-  <div id="gamesList">
-    <ul class="list-group">
-      <li class="list-group-item">Cras justo odio</li>
-      <li class="list-group-item">Dapibus ac facilisis in</li>
-      <li class="list-group-item">Morbi leo risus</li>
-      <li class="list-group-item">Porta ac consectetur ac</li>
-      <li class="list-group-item">Vestibulum at eros</li>
-    </ul>
-  </div>
--->
-
 
   <script src="js/jquery.min.js"></script>
   <script src="js/popper.min.js"></script>

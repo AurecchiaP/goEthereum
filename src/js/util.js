@@ -20,10 +20,9 @@ class Board {
 
 var boardDiv = $('#board');
 
-var placedStone = new Stone(0, 0, 'white');
+var placedStone = new Stone(-1, -1, 'white');
 
 // create an empty array for the board 19x19
-// let board = [];
 var board = new Board([], 0);
 
 for (let i = 0; i < 19; i++) {
@@ -37,6 +36,8 @@ for (let i = 0; i < 19; i++) {
   }
 }
 
+// NOTE for this to work, the board and stones have to be visible, else the stones
+// will stack as they have no size
 // for (let i = 0; i < 19; i++) {
 //   for (let j = 0; j < 19; j++) {
 //     board.updateSize();
@@ -96,18 +97,33 @@ boardDiv.on('click', this, function() {
   let cellY = Math.floor(19 * y / board.width);
 
   if (cellX < 19 && cellY < 19) {
-    $('#placedStone').css({
-      display: 'block',
-      top: cellY * board.cellWidth + 'px',
-      left: cellX * board.cellWidth + 'px'
-    });
-    placedStone.x = cellX;
-    placedStone.y = cellY;
-    console.log("placed stone: ", placedStone.x, placedStone.y);
+    if (placedStone.x == cellX && placedStone.y == cellY) {
+      $('#placedStone').css({
+        display: 'none'
+      });
+      placedStone.x = -1;
+      placedStone.y = -1;
+      $('#moveButton').prop('disabled', true);
+      console.log("removed stone");
+    } else {
+      $('#placedStone').css({
+        display: 'block',
+        top: cellY * board.cellWidth + 'px',
+        left: cellX * board.cellWidth + 'px'
+      });
+      placedStone.x = cellX;
+      placedStone.y = cellY;
+      $('#moveButton').prop('disabled', false);
+      console.log("placed stone: ", placedStone.x, placedStone.y);
+    }
   }
 });
 
-$( window ).resize(function() {
-  // boardDiv.empty();
-  // board.updateSize();
+$('#moveButton').on('click', this, function() {
+  console.log('pressed');
 });
+
+// $( window ).resize(function() {
+// boardDiv.empty();
+// board.updateSize();
+// });

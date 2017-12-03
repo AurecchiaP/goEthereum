@@ -1,19 +1,25 @@
-
 #board {
-    background: url(../images/board.svg) no-repeat top left;
-    background-size: contain;
-    position: relative;
-    width: 50vw;
-    height: 50vw;
-    margin: auto;
-    margin-top: 1em;
-    /*padding-bottom: 0;*/
+  background: url(../images/board.svg) no-repeat top left;
+  background-size: contain;
+  position: relative;
+  width: 50vw;
+  height: 50vw;
+  padding: 0;
+  margin: 0;
+}
+
+.centerContent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
 }
 
 .stone {
-    position: absolute;
-    width: 2.7vw;
-    height: 2.7vh;
+  position: absolute;
+  width: 2.7vw;
+  height: 2.7vh;
 }
 
 .white {
@@ -27,9 +33,9 @@
 }
 
 #hoverStone, #placedStone {
-    display: none;
+  display: none;
 }
 
 #gamesList {
-    padding: 1em;
+  padding: 1em;
 }
