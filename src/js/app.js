@@ -37,35 +37,35 @@ App = {
   },
 
   initContract: function() {
-    $.getJSON('Adoption.json', function(data) {
+    $.getJSON('Go.json', function(data) {
       // Get the necessary contract artifact file and instantiate it with truffle-contract
-      var AdoptionArtifact = data;
-      App.contracts.Adoption = TruffleContract(AdoptionArtifact);
+      var GoArtifact = data;
+      App.contracts.Go = TruffleContract(GoArtifact);
 
       // Set the provider for our contract
-      App.contracts.Adoption.setProvider(App.web3Provider);
+      App.contracts.Go.setProvider(App.web3Provider);
 
       // Use our contract to retrieve and mark the adopted pets
-      return App.markAdopted();
+      return App.markMove();
     });
 
     return App.bindEvents();
   },
 
   bindEvents: function() {
-    $(document).on('click', '.btn-adopt', App.handleAdopt);
+    $(document).on('click', '#moveButton', App.handleMove);
   },
 
-  markAdopted: function(adopters, account) {
-    var adoptionInstance;
+  markMove: function(board, account) {
+    var goInstance;
 
-    App.contracts.Adoption.deployed().then(function(instance) {
-      adoptionInstance = instance;
+    App.contracts.Go.deployed().then(function(instance) {
+      goInstance = instance;
 
-      return adoptionInstance.getAdopters.call();
-    }).then(function(adopters) {
-      console.log(adopters);
-      for (i = 0; i < adopters.length; i++) {
+      return goInstance.getBoard.call();
+    }).then(function(board) {
+      console.log(board);
+      for (i = 0; i < board.length; i++) {
         // if (adopters[i] !== '0x') {
         //   $('.panel-pet').eq(i).find('button').text('Success').attr('disabled', true);
         // }
@@ -75,12 +75,17 @@ App = {
     });
   },
 
-  handleAdopt: function(event) {
+  handleMove: function(event) {
     event.preventDefault();
 
-    var petId = parseInt($(event.target).data('id'));
+    // get the current position of the stone
+    console.log(placedStone.x);
+    var pos = placedStone.x + 19*placedStone.y;
 
-    var adoptionInstance;
+    // when you click confirm, it should store the right number at that position
+
+
+    var goInstance;
 
     web3.eth.getAccounts(function(error, accounts) {
       if (error) {
@@ -89,15 +94,13 @@ App = {
 
       var account = accounts[0];
 
-      App.contracts.Adoption.deployed().then(function(instance) {
-        adoptionInstance = instance;
+      App.contracts.Go.deployed().then(function(instance) {
+        goInstance = instance;
 
         // Execute adopt as a transaction by sending account
-        return adoptionInstance.adopt(petId, {
-          from: account
-        });
+        return goInstance.move(pos);
       }).then(function(result) {
-        return App.markAdopted();
+        return App.markMove(board.data, account);
       }).catch(function(err) {
         console.log(err.message);
       });

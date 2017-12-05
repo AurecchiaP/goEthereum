@@ -5,9 +5,9 @@ contract Go {
   address public player2;
 
   struct Game {
-      byte[361] board;
+      uint[361] board;
       byte state;
-      byte turn;
+      uint turn;
   }
 
   Game game;
@@ -33,20 +33,26 @@ contract Go {
         (msg.sender == owner   && game.turn == 0) ||
         (msg.sender == player2 && game.turn == 1));
 
-      game.board[pos] = game.turn;
+      game.board[pos] = game.turn + 1;
       // board has to be updated. where/how we do this?
 
   }
 
-  function getBoard()public returns (byte[361]) {
+  function getBoard()public view returns (uint[361]) {
     return game.board;
   }
 
   function setVariable(uint pos)public{
-    if(pos < 362){
+    if(pos < 361){
       game.board[pos] = 1;
 
     }
+  }
+  function getMove(uint pos) public pure returns(uint){
+    if(pos < 361){
+      return pos;
+    }
+    return 404; // illegal position
   }
 }
 
