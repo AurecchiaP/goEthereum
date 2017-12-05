@@ -7,10 +7,14 @@ contract Go {
   struct Game {
       uint[361] board;
       byte state;
+      /*TODO use bool*/
       uint turn;
   }
 
+
   Game game;
+
+  address[] games;
 
   modifier ownerRestricted() {
     if (msg.sender == owner) _;
@@ -24,25 +28,29 @@ contract Go {
     owner = msg.sender;
   }
 
-
-  function move(uint pos) public {
-      // assert move is right
-
-      // do require with modifiers?
-      require(
-        (msg.sender == owner   && game.turn == 0) ||
-        (msg.sender == player2 && game.turn == 1));
-
-      game.board[pos] = game.turn + 1;
-      // board has to be updated. where/how we do this?
-
+  function newGame() public {
+    /* TODO create a new contract game and push its address */
+    games.push(0x0);
   }
 
-  function getBoard()public view returns (uint[361]) {
+  function getGames() public view returns (address[]) {
+    return games;
+  }
+
+
+  function move(uint pos) public ownerRestricted() {
+    games.push(owner);
+
+    game.turn = game.turn + 1;
+    game.board[pos] = game.turn;
+    game.turn = game.turn % 2;
+  }
+
+  function getBoard() public view returns (uint[361]) {
     return game.board;
   }
 
-  function setVariable(uint pos)public{
+  function setVariable (uint pos) public {
     if(pos < 361){
       game.board[pos] = 1;
 

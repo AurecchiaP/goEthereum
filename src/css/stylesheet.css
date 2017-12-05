@@ -6,6 +6,7 @@
   height: 50vw;
   padding: 0;
   margin: 1em;
+  cursor: pointer;
 }
 
 .centerContent {

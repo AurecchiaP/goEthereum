@@ -37,6 +37,12 @@
     </li>
   </ul>
 
+  <!-- <div id="board">
+    <div id="hoverStone" class="stone white"></div>
+    <div id="placedStone" class="stone black"></div> -->
+    <!-- FILLED IN BY UTIL.JS -->
+  <!-- </div> -->
+
   <!-- Tab panes -->
   <div class="tab-content">
     <!-- ---------------------------- HOME -------------------------------- -->
@@ -63,6 +69,7 @@
     <div class="tab-pane" id="messages" role="tabpanel">
       <div class="container centerContent">
         create a new game
+        <input id="newGameButton" class="btn btn-primary" type="button" value="New game">
       </div>
     </div>
 
@@ -70,15 +77,32 @@
     <div class="tab-pane" id="settings" role="tabpanel">
       <div class="container centerContent">
         <p>maybe distinguish between games with only one player and my games</p>
-        <div id="gamesList">
-          <ul class="list-group">
-            <li class="list-group-item">game1</li>
-            <li class="list-group-item">game2</li>
-            <li class="list-group-item">game3</li>
-            <li class="list-group-item">game4</li>
-            <li class="list-group-item">game5</li>
-          </ul>
-        </div>
+          <div class="list-group" id="gamesList">
+            <!-- <a href="#" class="list-group-item list-group-item-action flex-column align-items-start active">
+              <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">List group item heading</h5>
+                <small>3 days ago</small>
+              </div>
+              <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
+              <small>Donec id elit non mi porta.</small>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+              <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">List group item heading</h5>
+                <small class="text-muted">3 days ago</small>
+              </div>
+              <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
+              <small class="text-muted">Donec id elit non mi porta.</small>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+              <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">List group item heading</h5>
+                <small class="text-muted">3 days ago</small>
+              </div>
+              <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
+              <small class="text-muted">Donec id elit non mi porta.</small>
+            </a> -->
+          </div>
       </div>
     </div>
 

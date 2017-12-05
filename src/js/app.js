@@ -1,3 +1,5 @@
+var test;
+
 App = {
   web3Provider: null,
   contracts: {},
@@ -40,11 +42,11 @@ App = {
     $.getJSON('Go.json', function(data) {
       // Get the necessary contract artifact file and instantiate it with truffle-contract
       var GoArtifact = data;
+
       App.contracts.Go = TruffleContract(GoArtifact);
 
       // Set the provider for our contract
       App.contracts.Go.setProvider(App.web3Provider);
-
       // Use our contract to retrieve and mark the adopted pets
       return App.markMove();
     });
@@ -54,22 +56,43 @@ App = {
 
   bindEvents: function() {
     $(document).on('click', '#moveButton', App.handleMove);
+    $(document).on('click', '#newGameButton', App.handleNewGame);
   },
 
-  markMove: function(board, account) {
+  markMove: function() {
     var goInstance;
 
     App.contracts.Go.deployed().then(function(instance) {
       goInstance = instance;
 
       return goInstance.getBoard.call();
-    }).then(function(board) {
-      console.log(board);
-      for (i = 0; i < board.length; i++) {
-        // if (adopters[i] !== '0x') {
-        //   $('.panel-pet').eq(i).find('button').text('Success').attr('disabled', true);
-        // }
+    }).then(function(newBoard) {
+      // FIXME SUPER UGLY
+      console.log(newBoard);
+      for (let i = 0; i < 19; i++) {
+        for (let j = 0; j < 19; j++) {
+          board.updateSize();
+          let stone;
+          if (newBoard[i * 19 + j].c[0] == 1) {
+            stone = $('<div class="stone white as" id="stone' + (i * 19 + j) + '"></div>');
+            stone.css({
+              display: 'block',
+              top:  i/19 * 100 + '%',
+              left: j/19 * 100 + '%'
+            });
+            boardDiv.append(stone);
+          } else if (newBoard[i * 19 + j].c[0] == 2) {
+            stone = $('<div class="stone black as" id="stone' + (i * 19 + j) + '"></div>');
+            stone.css({
+              display: 'block',
+              top:  i/19 * 100 + '%',
+              left: j/19 * 100 + '%'
+            });
+            boardDiv.append(stone);
+          }
+        }
       }
+
     }).catch(function(err) {
       console.log(err.message);
     });
@@ -80,7 +103,7 @@ App = {
 
     // get the current position of the stone
     console.log(placedStone.x);
-    var pos = placedStone.x + 19*placedStone.y;
+    var pos = placedStone.x + 19 * placedStone.y;
 
     // when you click confirm, it should store the right number at that position
 
@@ -93,6 +116,7 @@ App = {
       }
 
       var account = accounts[0];
+      console.log(accounts);
 
       App.contracts.Go.deployed().then(function(instance) {
         goInstance = instance;
@@ -104,6 +128,48 @@ App = {
       }).catch(function(err) {
         console.log(err.message);
       });
+    });
+  },
+
+  handleNewGame: function(event) {
+    event.preventDefault();
+
+    var goInstance;
+
+    web3.eth.getAccounts(function(error, accounts) {
+      if (error) {
+        console.log(error);
+      }
+
+      var account = accounts[0];
+      console.log(accounts);
+
+      App.contracts.Go.deployed().then(function(instance) {
+          goInstance = instance;
+
+          // Execute adopt as a transaction by sending account
+          return goInstance.newGame();
+        }).then(function(result) {
+          // console.log(result);
+          return goInstance.getGames.call();
+
+        })
+        .then(function(games) {
+          console.log(games);
+          $('#gamesList').empty();
+          for (let i = 0; i < games.length; i++) {
+            item = $('<a href="#" class="list-group-item list-group-item-action flex-column align-items-start active"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1">List group item heading</h5><small>3 days ago</small></div><p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p><small>Donec id elit non mi porta.</small></a>');
+            // stone.css({
+            //   display: 'block',
+            //   top: i * board.cellWidth + 'px',
+            //   left: j * board.cellWidth + 'px'
+            // });
+            $('#gamesList').append(item);
+          }
+        })
+        .catch(function(err) {
+          console.log(err.message);
+        });
     });
   }
 
