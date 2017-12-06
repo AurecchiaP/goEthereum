@@ -40,6 +40,7 @@
 }
 
 #hoverStone, #placedStone {
+  opacity: .5;
   display: none;
 }
 
