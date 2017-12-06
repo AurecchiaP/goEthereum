@@ -6,7 +6,6 @@ import "./GoGame.sol";
 contract Go {
   address public owner;
   address[] games;
-  uint c;
 
   function Go() public {
     owner = msg.sender;
@@ -14,7 +13,6 @@ contract Go {
 
   function newGame() public {
     address game = new GoGame(msg.sender);
-    c = c + 1;
     games.push(game);
   }
 

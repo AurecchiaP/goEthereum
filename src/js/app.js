@@ -1,5 +1,3 @@
-var test;
-
 App = {
   web3Provider: null,
   contracts: {},
@@ -52,10 +50,6 @@ App = {
       if (error) {
         console.log(error);
       }
-
-      var account = accounts[0];
-      console.log(accounts);
-
       App.contracts.Go.deployed().then(function(instance) {
           goInstance = instance;
 
@@ -113,20 +107,16 @@ App = {
       return;
     }
 
-    var goInstance;
-
     web3.eth.getAccounts(function(error, accounts) {
       if (error) {
         console.log(error);
       }
 
-      var account = accounts[0];
-      console.log(accounts);
+      let index = gamesList.indexOf(selectedGameAddress);
 
-      // FIXME 0 is static, make it index of current game
-      App.contracts.Games[0].move(pos)
+      App.contracts.Games[index].move(pos)
         .then(function(res) {
-          App.contracts.Games[0].getBoard.call()
+          App.contracts.Games[index].getBoard.call()
             .then(function(res) {
               board.data = res;
               App.loadBoard();
@@ -134,7 +124,6 @@ App = {
         })
         .catch(function(err) {
           console.log(err.message);
-
         })
     });
   },
@@ -146,9 +135,6 @@ App = {
       if (error) {
         console.log(error);
       }
-
-      var account = accounts[0];
-      console.log(accounts);
 
       App.contracts.Go.deployed().then(function(instance) {
           goInstance = instance;
@@ -181,7 +167,6 @@ App = {
         App.contracts.Games[i].getData.call()
           .then(function(res) {
             gamesData[i] = res;
-            console.log(gamesData[i]);
             let turn = gamesData[i][2].c[0] == 0 ? 'owner' : 'opponent';
             item = $('<a href="#" id="game-' + i + '" class="game-item list-group-item list-group-item-action flex-column align-items-start"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1">Ongoing</h5><small>state</small></div><p class="mb-1">' + gamesData[i][0] + ' vs ' + gamesData[i][1] + '</p><small>turn: ' + turn + '</small></a>');
             item.on('click', this, function(event) {
@@ -198,22 +183,20 @@ App = {
               let game = gamesList[index];
 
               $.getJSON('GoGame.json', function(data) {
-
                 App.contracts.Games[i] = TruffleContract(data);
                 App.contracts.Games[i].setProvider(App.web3Provider);
                 App.contracts.Games[i] = App.contracts.Games[i].at(game);
                 App.contracts.Games[i].getData.call()
                   .then(function(res) {
-                    // TODO should load the board and such, call 'selectGame'
-                    console.log(res);
                     gamesData[i] = res;
                     App.selectGame(i);
-
                   })
               });
-
             })
             $('#gamesList').append(item);
+          })
+          .catch(function(err) {
+            console.log(err.message);
           })
       });
     }
@@ -226,7 +209,10 @@ App = {
       .then(function(res) {
         board.data = res;
         App.loadBoard();
-      });
+      })
+      .catch(function(err) {
+        console.log(err.message);
+      })
   }
 
 };
