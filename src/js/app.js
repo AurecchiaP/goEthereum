@@ -5,22 +5,6 @@ App = {
   contracts: {},
 
   init: function() {
-    // Load pets.
-    $.getJSON('../pets.json', function(data) {
-      var petsRow = $('#petsRow');
-      var petTemplate = $('#petTemplate');
-
-      for (i = 0; i < data.length; i++) {
-        petTemplate.find('.panel-title').text(data[i].name);
-        petTemplate.find('img').attr('src', data[i].picture);
-        petTemplate.find('.pet-breed').text(data[i].breed);
-        petTemplate.find('.pet-age').text(data[i].age);
-        petTemplate.find('.pet-location').text(data[i].location);
-        petTemplate.find('.btn-adopt').attr('data-id', data[i].id);
-
-        petsRow.append(petTemplate.html());
-      }
-    });
 
     return App.initWeb3();
   },
@@ -39,6 +23,7 @@ App = {
   },
 
   initContract: function() {
+    App.contracts.Games = [];
     $.getJSON('Go.json', function(data) {
       // Get the necessary contract artifact file and instantiate it with truffle-contract
       var GoArtifact = data;
@@ -86,44 +71,33 @@ App = {
     });
   },
 
-  // markMove: function() {
-  //   var goInstance;
-  //
-  //   App.contracts.Go.deployed().then(function(instance) {
-  //     goInstance = instance;
-  //
-  //     return goInstance.getBoard.call();
-  //   }).then(function(newBoard) {
-  //     // FIXME SUPER UGLY
-  //     console.log(newBoard);
-  //     for (let i = 0; i < 19; i++) {
-  //       for (let j = 0; j < 19; j++) {
-  //         board.updateSize();
-  //         let stone;
-  //         if (newBoard[i * 19 + j].c[0] == 1) {
-  //           stone = $('<div class="stone white as" id="stone' + (i * 19 + j) + '"></div>');
-  //           stone.css({
-  //             display: 'block',
-  //             top:  i/19 * 100 + '%',
-  //             left: j/19 * 100 + '%'
-  //           });
-  //           boardDiv.append(stone);
-  //         } else if (newBoard[i * 19 + j].c[0] == 2) {
-  //           stone = $('<div class="stone black as" id="stone' + (i * 19 + j) + '"></div>');
-  //           stone.css({
-  //             display: 'block',
-  //             top:  i/19 * 100 + '%',
-  //             left: j/19 * 100 + '%'
-  //           });
-  //           boardDiv.append(stone);
-  //         }
-  //       }
-  //     }
-  //
-  //   }).catch(function(err) {
-  //     console.log(err.message);
-  //   });
-  // },
+  loadBoard: function() {
+    boardDiv.find('.temporary-stone').remove()
+
+    for (let i = 0; i < 19; i++) {
+      for (let j = 0; j < 19; j++) {
+        board.updateSize();
+        let stone;
+        if (board.data[i * 19 + j].c[0] == 1) {
+          stone = $('<div class="stone white temporary-stone" id="stone' + (i * 19 + j) + '"></div>');
+          stone.css({
+            display: 'block',
+            top: i / 19 * 100 + '%',
+            left: j / 19 * 100 + '%'
+          });
+          boardDiv.append(stone);
+        } else if (board.data[i * 19 + j].c[0] == 2) {
+          stone = $('<div class="stone black temporary-stone" id="stone' + (i * 19 + j) + '"></div>');
+          stone.css({
+            display: 'block',
+            top: i / 19 * 100 + '%',
+            left: j / 19 * 100 + '%'
+          });
+          boardDiv.append(stone);
+        }
+      }
+    }
+  },
 
   handleMove: function(event) {
     event.preventDefault();
@@ -134,6 +108,10 @@ App = {
 
     // when you click confirm, it should store the right number at that position
 
+    if (!selectedGameAddress) {
+      console.log("no selected game");
+      return;
+    }
 
     var goInstance;
 
@@ -145,23 +123,24 @@ App = {
       var account = accounts[0];
       console.log(accounts);
 
-      App.contracts.Go.deployed().then(function(instance) {
-        goInstance = instance;
+      // FIXME 0 is static, make it index of current game
+      App.contracts.Games[0].move(pos)
+        .then(function(res) {
+          App.contracts.Games[0].getBoard.call()
+            .then(function(res) {
+              board.data = res;
+              App.loadBoard();
+            });
+        })
+        .catch(function(err) {
+          console.log(err.message);
 
-        // Execute adopt as a transaction by sending account
-        return goInstance.move(pos);
-      }).then(function(result) {
-        return App.markMove(board.data, account);
-      }).catch(function(err) {
-        console.log(err.message);
-      });
+        })
     });
   },
 
   handleNewGame: function(event) {
     event.preventDefault();
-
-    var goInstance;
 
     web3.eth.getAccounts(function(error, accounts) {
       if (error) {
@@ -194,42 +173,60 @@ App = {
     gamesList = games;
     $('#gamesList').empty();
     for (let i = 0; i < games.length; i++) {
-      // item = $('<a href="#" id="game-' + i + '" class="game-item list-group-item list-group-item-action flex-column align-items-start"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1">List group item heading</h5><small>3 days ago</small></div><p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p><small>Donec id elit non mi porta.</small></a>');
-      item = $('<a href="#" id="game-' + i + '" class="game-item list-group-item list-group-item-action flex-column align-items-start"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1">List group item heading</h5><small>date of something or dk</small></div><p class="mb-1">Owner vs guy</p><small>turn</small></a>');
-      item.on('click', this, function(event) {
-        // TODO when game is clicked, we should get its data and put it in local
-        let item = event.target;
-        while (!item.classList.contains('game-item')) {
-          item = item.parentElement;
-        }
-        if(selectedGame) {
-          selectedGame.classList.remove("active");
-        }
-        item.classList.add("active");
-        selectedGame = item;
-        let index = item.id.split('-')[1];
-        let game = gamesList[index];
-
-        $.getJSON('GoGame.json', function(data) {
-
-          App.contracts.Game = TruffleContract(data);
-          App.contracts.Game.setProvider(App.web3Provider);
-
-           App.contracts.Game = App.contracts.Game.at(game);
-
-          App.contracts.Game.getNumber.call()
+      let game = gamesList[i];
+      $.getJSON('GoGame.json', function(data) {
+        App.contracts.Games[i] = TruffleContract(data);
+        App.contracts.Games[i].setProvider(App.web3Provider);
+        App.contracts.Games[i] = App.contracts.Games[i].at(game);
+        App.contracts.Games[i].getData.call()
           .then(function(res) {
-            console.log(res);
-          })
+            gamesData[i] = res;
+            console.log(gamesData[i]);
+            let turn = gamesData[i][2].c[0] == 0 ? 'owner' : 'opponent';
+            item = $('<a href="#" id="game-' + i + '" class="game-item list-group-item list-group-item-action flex-column align-items-start"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1">Ongoing</h5><small>state</small></div><p class="mb-1">' + gamesData[i][0] + ' vs ' + gamesData[i][1] + '</p><small>turn: ' + turn + '</small></a>');
+            item.on('click', this, function(event) {
+              let item = event.target;
+              while (!item.classList.contains('game-item')) {
+                item = item.parentElement;
+              }
+              if (selectedGameElement) {
+                selectedGameElement.classList.remove("active");
+              }
+              item.classList.add("active");
+              selectedGameElement = item;
+              let index = item.id.split('-')[1];
+              let game = gamesList[index];
 
-        });
-      })
-      $('#gamesList').append(item);
+              $.getJSON('GoGame.json', function(data) {
+
+                App.contracts.Games[i] = TruffleContract(data);
+                App.contracts.Games[i].setProvider(App.web3Provider);
+                App.contracts.Games[i] = App.contracts.Games[i].at(game);
+                App.contracts.Games[i].getData.call()
+                  .then(function(res) {
+                    // TODO should load the board and such, call 'selectGame'
+                    console.log(res);
+                    gamesData[i] = res;
+                    App.selectGame(i);
+
+                  })
+              });
+
+            })
+            $('#gamesList').append(item);
+          })
+      });
     }
   },
 
-  selectGame: function() {
+  selectGame: function(index) {
+    selectedGameAddress = gamesList[index];
 
+    App.contracts.Games[index].getBoard.call()
+      .then(function(res) {
+        board.data = res;
+        App.loadBoard();
+      });
   }
 
 };

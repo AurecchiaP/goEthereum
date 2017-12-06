@@ -13,7 +13,7 @@ contract Go {
   }
 
   function newGame() public {
-    address game = new GoGame(c);
+    address game = new GoGame(msg.sender);
     c = c + 1;
     games.push(game);
   }

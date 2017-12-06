@@ -3,7 +3,6 @@ pragma solidity 0.4.18;
 contract GoGame {
   address public owner;
   address public opponent;
-  uint n;
 
   struct Game {
       uint[361] board;
@@ -13,17 +12,19 @@ contract GoGame {
 
   Game game;
 
-  function GoGame(uint c) public {
-    n = c;
-    owner = msg.sender;
+  function GoGame(address gameOwner) public {
+    owner = gameOwner;
   }
 
   function move(uint pos) public {
+    if(msg.sender != owner && opponent == 0) {
+      opponent = msg.sender;
+    }
     if (game.turn == 0 && owner == msg.sender) {
       game.turn = game.turn + 1;
       game.board[pos] = game.turn;
       game.turn = game.turn % 2;
-    } else if (game.turn == 1 && owner != msg.sender) {
+    } else if (game.turn == 1 && opponent == msg.sender) {
       game.turn = game.turn + 1;
       game.board[pos] = game.turn;
       game.turn = game.turn % 2;
@@ -34,8 +35,8 @@ contract GoGame {
     return game.board;
   }
 
-  function getNumber() public view returns (uint) {
-    return n;
+  function getData() public view returns (address, address, uint) {
+    return (owner, opponent, game.turn);
   }
 
   function setVariable(uint pos) public {

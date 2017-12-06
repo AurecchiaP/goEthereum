@@ -23,9 +23,11 @@ var boardDiv = $('#board');
 var placedStone = new Stone(-1, -1, 'white');
 
 // create an empty array for the board 19x19
+//TODO maybe make this into a session object? ugly
 var board = new Board([], 0);
 var gamesList = [];
-var selectedGame;
+var gamesData = [];
+var selectedGameElement, selectedGameAddress;
 
 // when the cursor hovers the board, show where the stone would be placed
 boardDiv.on('mousemove', this, function() {
@@ -43,8 +45,8 @@ boardDiv.on('mousemove', this, function() {
   if (cellX < 19 && cellX >= 0 && cellY < 19 && cellY >= 0) {
     $('#hoverStone').css({
       display: 'block',
-      top: cellY/19 * 100 + '%',
-      left: cellX/19 * 100 + '%'
+      top: cellY / 19 * 100 + '%',
+      left: cellX / 19 * 100 + '%'
     });
   }
 });
@@ -79,8 +81,8 @@ boardDiv.on('click', this, function() {
     } else {
       $('#placedStone').css({
         display: 'block',
-        top: cellY/19 * 100 + '%',
-        left: cellX/19 * 100 + '%'
+        top: cellY / 19 * 100 + '%',
+        left: cellX / 19 * 100 + '%'
       });
       placedStone.x = cellX;
       placedStone.y = cellY;
