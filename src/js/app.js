@@ -48,7 +48,7 @@ App = {
       // Set the provider for our contract
       App.contracts.Go.setProvider(App.web3Provider);
       // Use our contract to retrieve and mark the adopted pets
-      return App.markMove();
+      return App.loadGames();
     });
 
     return App.bindEvents();
@@ -59,44 +59,71 @@ App = {
     $(document).on('click', '#newGameButton', App.handleNewGame);
   },
 
-  markMove: function() {
+  loadGames: function() {
+
     var goInstance;
 
-    App.contracts.Go.deployed().then(function(instance) {
-      goInstance = instance;
-
-      return goInstance.getBoard.call();
-    }).then(function(newBoard) {
-      // FIXME SUPER UGLY
-      console.log(newBoard);
-      for (let i = 0; i < 19; i++) {
-        for (let j = 0; j < 19; j++) {
-          board.updateSize();
-          let stone;
-          if (newBoard[i * 19 + j].c[0] == 1) {
-            stone = $('<div class="stone white as" id="stone' + (i * 19 + j) + '"></div>');
-            stone.css({
-              display: 'block',
-              top:  i/19 * 100 + '%',
-              left: j/19 * 100 + '%'
-            });
-            boardDiv.append(stone);
-          } else if (newBoard[i * 19 + j].c[0] == 2) {
-            stone = $('<div class="stone black as" id="stone' + (i * 19 + j) + '"></div>');
-            stone.css({
-              display: 'block',
-              top:  i/19 * 100 + '%',
-              left: j/19 * 100 + '%'
-            });
-            boardDiv.append(stone);
-          }
-        }
+    web3.eth.getAccounts(function(error, accounts) {
+      if (error) {
+        console.log(error);
       }
 
-    }).catch(function(err) {
-      console.log(err.message);
+      var account = accounts[0];
+      console.log(accounts);
+
+      App.contracts.Go.deployed().then(function(instance) {
+          goInstance = instance;
+
+          // Execute adopt as a transaction by sending account
+          return goInstance.getGames.call();
+        })
+        .then(function(games) {
+          App.updateGamesList(games)
+        })
+        .catch(function(err) {
+          console.log(err.message);
+        });
     });
   },
+
+  // markMove: function() {
+  //   var goInstance;
+  //
+  //   App.contracts.Go.deployed().then(function(instance) {
+  //     goInstance = instance;
+  //
+  //     return goInstance.getBoard.call();
+  //   }).then(function(newBoard) {
+  //     // FIXME SUPER UGLY
+  //     console.log(newBoard);
+  //     for (let i = 0; i < 19; i++) {
+  //       for (let j = 0; j < 19; j++) {
+  //         board.updateSize();
+  //         let stone;
+  //         if (newBoard[i * 19 + j].c[0] == 1) {
+  //           stone = $('<div class="stone white as" id="stone' + (i * 19 + j) + '"></div>');
+  //           stone.css({
+  //             display: 'block',
+  //             top:  i/19 * 100 + '%',
+  //             left: j/19 * 100 + '%'
+  //           });
+  //           boardDiv.append(stone);
+  //         } else if (newBoard[i * 19 + j].c[0] == 2) {
+  //           stone = $('<div class="stone black as" id="stone' + (i * 19 + j) + '"></div>');
+  //           stone.css({
+  //             display: 'block',
+  //             top:  i/19 * 100 + '%',
+  //             left: j/19 * 100 + '%'
+  //           });
+  //           boardDiv.append(stone);
+  //         }
+  //       }
+  //     }
+  //
+  //   }).catch(function(err) {
+  //     console.log(err.message);
+  //   });
+  // },
 
   handleMove: function(event) {
     event.preventDefault();
@@ -155,22 +182,54 @@ App = {
 
         })
         .then(function(games) {
-          console.log(games);
-          $('#gamesList').empty();
-          for (let i = 0; i < games.length; i++) {
-            item = $('<a href="#" class="list-group-item list-group-item-action flex-column align-items-start active"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1">List group item heading</h5><small>3 days ago</small></div><p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p><small>Donec id elit non mi porta.</small></a>');
-            // stone.css({
-            //   display: 'block',
-            //   top: i * board.cellWidth + 'px',
-            //   left: j * board.cellWidth + 'px'
-            // });
-            $('#gamesList').append(item);
-          }
+          App.updateGamesList(games);
         })
         .catch(function(err) {
           console.log(err.message);
         });
     });
+  },
+
+  updateGamesList: function(games) {
+    gamesList = games;
+    $('#gamesList').empty();
+    for (let i = 0; i < games.length; i++) {
+      // item = $('<a href="#" id="game-' + i + '" class="game-item list-group-item list-group-item-action flex-column align-items-start"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1">List group item heading</h5><small>3 days ago</small></div><p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p><small>Donec id elit non mi porta.</small></a>');
+      item = $('<a href="#" id="game-' + i + '" class="game-item list-group-item list-group-item-action flex-column align-items-start"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1">List group item heading</h5><small>date of something or dk</small></div><p class="mb-1">Owner vs guy</p><small>turn</small></a>');
+      item.on('click', this, function(event) {
+        // TODO when game is clicked, we should get its data and put it in local
+        let item = event.target;
+        while (!item.classList.contains('game-item')) {
+          item = item.parentElement;
+        }
+        if(selectedGame) {
+          selectedGame.classList.remove("active");
+        }
+        item.classList.add("active");
+        selectedGame = item;
+        let index = item.id.split('-')[1];
+        let game = gamesList[index];
+
+        $.getJSON('GoGame.json', function(data) {
+
+          App.contracts.Game = TruffleContract(data);
+          App.contracts.Game.setProvider(App.web3Provider);
+
+           App.contracts.Game = App.contracts.Game.at(game);
+
+          App.contracts.Game.getNumber.call()
+          .then(function(res) {
+            console.log(res);
+          })
+
+        });
+      })
+      $('#gamesList').append(item);
+    }
+  },
+
+  selectGame: function() {
+
   }
 
 };

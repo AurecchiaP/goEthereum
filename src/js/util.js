@@ -24,6 +24,8 @@ var placedStone = new Stone(-1, -1, 'white');
 
 // create an empty array for the board 19x19
 var board = new Board([], 0);
+var gamesList = [];
+var selectedGame;
 
 // when the cursor hovers the board, show where the stone would be placed
 boardDiv.on('mousemove', this, function() {
