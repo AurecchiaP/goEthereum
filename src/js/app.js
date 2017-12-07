@@ -37,7 +37,9 @@ App = {
   },
 
   bindEvents: function() {
+    // TODO maybe better to put the event on the button itself?
     $(document).on('click', '#moveButton', App.handleMove);
+    $(document).on('click', '#passButton', App.handlePass);
     $(document).on('click', '#newGameButton', App.handleNewGame);
   },
 
@@ -49,7 +51,7 @@ App = {
       if (error) {
         console.log(error);
       }
-      console.log($('#loader'))
+
       $('#loader').show();
       App.contracts.Go.deployed().then(function(instance) {
           goInstance = instance;
@@ -134,6 +136,38 @@ App = {
     });
   },
 
+  handlePass: function(event) {
+    event.preventDefault();
+
+    $('#loader').show();
+
+    if (!selectedGameAddress) {
+      console.log("no selected game");
+      $('#loader').hide();
+      return;
+    }
+
+    web3.eth.getAccounts(function(error, accounts) {
+      if (error) {
+        console.log(error);
+      }
+
+      let index = gamesList.indexOf(selectedGameAddress);
+
+      App.contracts.Games[index].pass()
+        .then(function(res) {
+          console.log('passed');
+          console.log(res);
+          $('#loader').hide();
+        })
+        .catch(function(err) {
+          console.log(err.message);
+          $('#loader').hide();
+        })
+    });
+
+  },
+
   handleNewGame: function(event) {
     event.preventDefault();
     $('#loader').show();
@@ -149,6 +183,7 @@ App = {
           // Execute adopt as a transaction by sending account
           return goInstance.newGame();
         }).then(function(result) {
+          // FIXME maybe this is not needed, we load games when we change tab
           return goInstance.getGames.call();
         })
         .then(function(games) {
@@ -175,7 +210,8 @@ App = {
           .then(function(res) {
             gamesData[i] = res;
             let turn = gamesData[i][2].c[0] == 0 ? 'owner' : 'opponent';
-            item = $('<a href="#" id="game-' + i + '" class="game-item list-group-item list-group-item-action flex-column align-items-start"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1">Ongoing</h5><small>state</small></div><p class="mb-1">' + gamesData[i][0] + ' vs ' + gamesData[i][1] + '</p><small>turn: ' + turn + '</small></a>');
+            let state = gamesData[i][3] == 0 ? 'ongoing' : gamesData[i][3] == 1 ? '1 won' : '2 won';
+            item = $('<a href="#" id="game-' + i + '" class="game-item list-group-item list-group-item-action flex-column align-items-start"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1">Ongoing</h5><small>state: ' + state + '</small></div><p class="mb-1">' + gamesData[i][0] + ' vs ' + gamesData[i][1] + '</p><small>turn: ' + turn + '</small></a>');
             item.on('click', this, function(event) {
               $('#loader').show();
               let item = event.target;

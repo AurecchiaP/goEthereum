@@ -91,3 +91,18 @@ boardDiv.on('click', this, function() {
     }
   }
 });
+
+$('.nav-item').on('click', this, function(event) {
+  let text = event.target.text;
+  if (text == 'Home') {
+
+  } else if (text == 'Game') {
+
+  } else if (text == 'New game') {
+
+  } else if (text == 'List of games') {
+    // FIXME this fixes the first game not showing (maybe) and the games not updating
+    // when the player joins, but it makes the game in the list not selected
+    // App.loadGames();
+  }
+})

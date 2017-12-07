@@ -6,8 +6,10 @@ contract GoGame {
 
   struct Game {
       uint[361] board;
-      byte state;
-      uint turn;
+      byte state; // 0: ongoing, 1: owner won, 2: opponent won
+      uint turn;  // 0: owner has to move, 1: opponent has to move
+      bool ownerPassed; // 0 if not passed, 1 if it has passed last turn
+      bool opponentPassed; // 0 if not passed, 1 if it has passed last turn
   }
 
   Game game;
@@ -21,13 +23,38 @@ contract GoGame {
       opponent = msg.sender;
     }
     if (game.turn == 0 && owner == msg.sender) {
+      /* TODO check validity of move */
       game.turn = game.turn + 1;
       game.board[pos] = game.turn;
       game.turn = game.turn % 2;
+      game.ownerPassed = false;
+
     } else if (game.turn == 1 && opponent == msg.sender) {
+      /* TODO check validity of move */
       game.turn = game.turn + 1;
       game.board[pos] = game.turn;
       game.turn = game.turn % 2;
+      game.opponentPassed = false;
+    }
+  }
+
+  function pass() public {
+    if(msg.sender != owner && opponent == 0) {
+      opponent = msg.sender;
+    }
+    if (game.turn == 0 && owner == msg.sender) {
+      game.ownerPassed = true;
+      game.turn = (game.turn + 1) % 2;
+
+
+    } else if (game.turn == 1 && opponent == msg.sender) {
+      game.opponentPassed = true;
+      game.turn = (game.turn + 1) % 2;
+    }
+
+    if(game.ownerPassed && game.opponentPassed) {
+      /* TODO check who won and set 1 or 2 */
+      game.state = 1;
     }
   }
 
@@ -35,14 +62,13 @@ contract GoGame {
     return game.board;
   }
 
-  function getData() public view returns (address, address, uint) {
-    return (owner, opponent, game.turn);
+  function getData() public view returns (address, address, uint, byte) {
+    return (owner, opponent, game.turn, game.state);
   }
 
   function setVariable(uint pos) public {
     if(pos < 361) {
       game.board[pos] = 1;
-
     }
   }
 
