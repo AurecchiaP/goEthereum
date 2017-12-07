@@ -8,8 +8,8 @@ body {
   background: url(../images/board.svg) no-repeat top left;
   background-size: contain;
   position: relative;
-  width: 50vw;
-  height: 50vw;
+  width: 30vw;
+  height: 30vw;
   padding: 0;
   margin: 1em;
   cursor: pointer;
@@ -26,8 +26,9 @@ body {
 
 .stone {
   position: absolute;
-  width: 2.63vw;
-  height: 2.63vw;
+  /*board width/19 = 30vw/19 = 1.58vw*/
+  width: 1.58vw;
+  height: 1.58vw;
   padding: 0;
   margin: 0;
   transition: all .2s;

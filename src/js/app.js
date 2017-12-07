@@ -3,7 +3,6 @@ App = {
   contracts: {},
 
   init: function() {
-
     return App.initWeb3();
   },
 
@@ -50,6 +49,8 @@ App = {
       if (error) {
         console.log(error);
       }
+      console.log($('#loader'))
+      $('#loader').show();
       App.contracts.Go.deployed().then(function(instance) {
           goInstance = instance;
 
@@ -58,6 +59,7 @@ App = {
         })
         .then(function(games) {
           App.updateGamesList(games)
+          $('#loader').hide();
         })
         .catch(function(err) {
           console.log(err.message);
@@ -91,10 +93,13 @@ App = {
         }
       }
     }
+    $('#loader').hide();
   },
 
   handleMove: function(event) {
     event.preventDefault();
+
+    $('#loader').show();
 
     // get the current position of the stone
     console.log(placedStone.x);
@@ -124,12 +129,14 @@ App = {
         })
         .catch(function(err) {
           console.log(err.message);
+          $('#loader').hide();
         })
     });
   },
 
   handleNewGame: function(event) {
     event.preventDefault();
+    $('#loader').show();
 
     web3.eth.getAccounts(function(error, accounts) {
       if (error) {
@@ -142,15 +149,15 @@ App = {
           // Execute adopt as a transaction by sending account
           return goInstance.newGame();
         }).then(function(result) {
-          // console.log(result);
           return goInstance.getGames.call();
-
         })
         .then(function(games) {
           App.updateGamesList(games);
+          $('#loader').hide();
         })
         .catch(function(err) {
           console.log(err.message);
+          $('#loader').hide();
         });
     });
   },
@@ -170,6 +177,7 @@ App = {
             let turn = gamesData[i][2].c[0] == 0 ? 'owner' : 'opponent';
             item = $('<a href="#" id="game-' + i + '" class="game-item list-group-item list-group-item-action flex-column align-items-start"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1">Ongoing</h5><small>state</small></div><p class="mb-1">' + gamesData[i][0] + ' vs ' + gamesData[i][1] + '</p><small>turn: ' + turn + '</small></a>');
             item.on('click', this, function(event) {
+              $('#loader').show();
               let item = event.target;
               while (!item.classList.contains('game-item')) {
                 item = item.parentElement;
@@ -191,12 +199,17 @@ App = {
                     gamesData[i] = res;
                     App.selectGame(i);
                   })
+                  .catch(function(err) {
+                    console.log(err.message);
+                    $('#loader').hide();
+                  })
               });
             })
             $('#gamesList').append(item);
           })
           .catch(function(err) {
             console.log(err.message);
+            $('#loader').hide();
           })
       });
     }
@@ -212,6 +225,7 @@ App = {
       })
       .catch(function(err) {
         console.log(err.message);
+        $('#loader').hide();
       })
   }
 
