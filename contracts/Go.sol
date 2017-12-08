@@ -11,10 +11,9 @@ contract Go {
     owner = msg.sender;
   }
 
-  function newGame() public returns (address[]) {
+  function newGame() public {
     address game = new GoGame(msg.sender);
     games.push(game);
-    return games;
   }
 
   function getGames() public view returns (address[]) {

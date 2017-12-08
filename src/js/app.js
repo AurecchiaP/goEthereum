@@ -180,13 +180,13 @@ App = {
       App.contracts.Go.deployed().then(function(instance) {
           goInstance = instance;
 
-          // Execute adopt as a transaction by sending account
           return goInstance.newGame();
         }).then(function(result) {
           // FIXME maybe this is not needed, we load games when we change tab
           return goInstance.getGames.call();
         })
         .then(function(games) {
+          console.log(games)
           App.updateGamesList(games);
           $('#loader').hide();
         })
