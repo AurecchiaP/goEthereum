@@ -50,7 +50,7 @@ App = {
         console.log(error);
       }
 
-      $('#loader').show();
+      $('#loader').fadeToggle('fast');
       App.contracts.Go.deployed().then(function(instance) {
           goInstance = instance;
 
@@ -59,7 +59,7 @@ App = {
         })
         .then(function(games) {
           App.updateGamesList(games)
-          $('#loader').hide();
+          $('#loader').fadeToggle('fast');
         })
         .catch(function(err) {
           console.log(err.message);
@@ -69,31 +69,33 @@ App = {
 
   loadBoard: function() {
     boardDiv.find('.temporary-stone').remove()
+    board.updateSize();
 
     for (let i = 0; i < 19; i++) {
       for (let j = 0; j < 19; j++) {
-        board.updateSize();
         let stone;
         if (board.data[i * 19 + j].c[0] == 1) {
           stone = $('<div class="stone white temporary-stone" id="stone' + (i * 19 + j) + '"></div>');
           stone.css({
-            display: 'block',
+            display: 'none',
             top: i / 19 * 100 + '%',
             left: j / 19 * 100 + '%'
           });
           boardDiv.append(stone);
+          stone.fadeToggle('fast');
         } else if (board.data[i * 19 + j].c[0] == 2) {
           stone = $('<div class="stone black temporary-stone" id="stone' + (i * 19 + j) + '"></div>');
           stone.css({
-            display: 'block',
+            display: 'none',
             top: i / 19 * 100 + '%',
             left: j / 19 * 100 + '%'
           });
           boardDiv.append(stone);
+          stone.fadeToggle('fast');
         }
       }
     }
-    $('#loader').hide();
+    $('#loader').fadeToggle('fast');
   },
 
   handleMove: function(event) {
@@ -110,7 +112,7 @@ App = {
       return;
     }
 
-    $('#loader').show();
+    $('#loader').fadeToggle('fast');
 
     web3.eth.getAccounts(function(error, accounts) {
       if (error) {
@@ -123,17 +125,18 @@ App = {
         .then(function(res) {
           App.contracts.Games[index].getBoard.call()
             .then(function(res) {
-              board.data = res[0];
+              board.data = res;
               // sometimes promises don't give back the updated data, so
               // knowing the move we do it manually
               // +1 because 0 stands for empty, 1 and 2 for placed stones
+              console.log(res)
               board.data[pos].c[0] = res[1].c[0] + 1;
               App.loadBoard();
             });
         })
         .catch(function(err) {
           console.log(err.message);
-          $('#loader').hide();
+          $('#loader').fadeToggle('fast');
         })
     });
   },
@@ -141,11 +144,11 @@ App = {
   handlePass: function(event) {
     event.preventDefault();
 
-    $('#loader').show();
+    $('#loader').fadeToggle('fast');
 
     if (!selectedGameAddress) {
       console.log("no selected game");
-      $('#loader').hide();
+      $('#loader').fadeToggle('fast');
       return;
     }
 
@@ -160,11 +163,11 @@ App = {
         .then(function(res) {
           console.log('passed');
           console.log(res);
-          $('#loader').hide();
+          $('#loader').fadeToggle('fast');
         })
         .catch(function(err) {
           console.log(err.message);
-          $('#loader').hide();
+          $('#loader').fadeToggle('fast');
         })
     });
 
@@ -172,7 +175,7 @@ App = {
 
   handleNewGame: function(event) {
     event.preventDefault();
-    $('#loader').show();
+    $('#loader').fadeToggle('fast');
 
     web3.eth.getAccounts(function(error, accounts) {
       if (error) {
@@ -184,11 +187,11 @@ App = {
 
           return goInstance.newGame();
         }).then(function(result) {
-          $('#loader').hide();
+          $('#loader').fadeToggle('fast');
         })
         .catch(function(err) {
           console.log(err.message);
-          $('#loader').hide();
+          $('#loader').fadeToggle('fast');
         });
     });
   },
@@ -210,7 +213,7 @@ App = {
             let state = gamesData[i][3] == 0 ? 'ongoing' : gamesData[i][3] == 1 ? '1 won' : '2 won';
             item = $('<a href="#" id="game-' + i + '" class="game-item list-group-item list-group-item-action flex-column align-items-start"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1">Ongoing</h5><small>state: ' + state + '</small></div><p class="mb-1">' + gamesData[i][0] + ' vs ' + gamesData[i][1] + '</p><small>turn: ' + turn + '</small></a>');
             item.on('click', this, function(event) {
-              $('#loader').show();
+              $('#loader').fadeToggle('fast');
               let item = event.target;
               while (!item.classList.contains('game-item')) {
                 item = item.parentElement;
@@ -234,7 +237,7 @@ App = {
                   })
                   .catch(function(err) {
                     console.log(err.message);
-                    $('#loader').hide();
+                    $('#loader').fadeToggle('fast');
                   })
               });
             })
@@ -242,7 +245,7 @@ App = {
           })
           .catch(function(err) {
             console.log(err.message);
-            $('#loader').hide();
+            $('#loader').fadeToggle('fast');
           })
       });
     }
@@ -250,15 +253,15 @@ App = {
 
   selectGame: function(index) {
     selectedGameAddress = gamesList[index];
-
+    // FIXME load also the state of the game (turn/state) and store it locally
     App.contracts.Games[index].getBoard.call()
       .then(function(res) {
-        board.data = res[0];
+        board.data = res;
         App.loadBoard();
       })
       .catch(function(err) {
         console.log(err.message);
-        $('#loader').hide();
+        $('#loader').fadeToggle('fast');
       })
   }
 

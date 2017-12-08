@@ -24,10 +24,13 @@ contract GoGame {
     }
     if (game.turn == 0 && owner == msg.sender) {
       /* TODO check validity of move */
+      /* +1 because its the next turn */
       game.turn = game.turn + 1;
+      /* +1 because 0 is empty, 1 is p1, 2 is p2 */
       game.board[pos] = game.turn;
       game.turn = game.turn % 2;
       game.ownerPassed = false;
+
 
     } else if (game.turn == 1 && opponent == msg.sender) {
       /* TODO check validity of move */
@@ -58,8 +61,8 @@ contract GoGame {
     }
   }
 
-  function getBoard() public view returns (uint[361], uint) {
-    return (game.board, game.turn);
+  function getBoard() public view returns (uint[361]) {
+    return game.board;
   }
 
   function getData() public view returns (address, address, uint, byte) {
