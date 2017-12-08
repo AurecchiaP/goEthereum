@@ -58,8 +58,8 @@ contract GoGame {
     }
   }
 
-  function getBoard() public view returns (uint[361]) {
-    return game.board;
+  function getBoard() public view returns (uint[361], uint) {
+    return (game.board, game.turn);
   }
 
   function getData() public view returns (address, address, uint, byte) {

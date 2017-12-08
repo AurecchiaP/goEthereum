@@ -101,8 +101,6 @@ $('.nav-item').on('click', this, function(event) {
   } else if (text == 'New game') {
 
   } else if (text == 'List of games') {
-    // FIXME this fixes the first game not showing (maybe) and the games not updating
-    // when the player joins, but it makes the game in the list not selected
-    // App.loadGames();
+    App.loadGames();
   }
 })

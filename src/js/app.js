@@ -29,8 +29,6 @@ App = {
 
       // Set the provider for our contract
       App.contracts.Go.setProvider(App.web3Provider);
-      // Use our contract to retrieve and mark the adopted pets
-      return App.loadGames();
     });
 
     return App.bindEvents();
@@ -101,8 +99,6 @@ App = {
   handleMove: function(event) {
     event.preventDefault();
 
-    $('#loader').show();
-
     // get the current position of the stone
     console.log(placedStone.x);
     var pos = placedStone.x + 19 * placedStone.y;
@@ -113,6 +109,8 @@ App = {
       console.log("no selected game");
       return;
     }
+
+    $('#loader').show();
 
     web3.eth.getAccounts(function(error, accounts) {
       if (error) {
@@ -125,7 +123,11 @@ App = {
         .then(function(res) {
           App.contracts.Games[index].getBoard.call()
             .then(function(res) {
-              board.data = res;
+              board.data = res[0];
+              // sometimes promises don't give back the updated data, so
+              // knowing the move we do it manually
+              // +1 because 0 stands for empty, 1 and 2 for placed stones
+              board.data[pos].c[0] = res[1].c[0] + 1;
               App.loadBoard();
             });
         })
@@ -182,12 +184,6 @@ App = {
 
           return goInstance.newGame();
         }).then(function(result) {
-          // FIXME maybe this is not needed, we load games when we change tab
-          return goInstance.getGames.call();
-        })
-        .then(function(games) {
-          console.log(games)
-          App.updateGamesList(games);
           $('#loader').hide();
         })
         .catch(function(err) {
@@ -198,9 +194,10 @@ App = {
   },
 
   updateGamesList: function(games) {
+    // NOTE this works assuming we don't delete games
+    let oldGamesList = gamesList;
     gamesList = games;
-    $('#gamesList').empty();
-    for (let i = 0; i < games.length; i++) {
+    for (let i = oldGamesList.length; i < games.length; i++) {
       let game = gamesList[i];
       $.getJSON('GoGame.json', function(data) {
         App.contracts.Games[i] = TruffleContract(data);
@@ -256,7 +253,7 @@ App = {
 
     App.contracts.Games[index].getBoard.call()
       .then(function(res) {
-        board.data = res;
+        board.data = res[0];
         App.loadBoard();
       })
       .catch(function(err) {
