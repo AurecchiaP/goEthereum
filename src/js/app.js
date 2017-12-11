@@ -102,8 +102,15 @@ App = {
     event.preventDefault();
 
     // get the current position of the stone
-    console.log(placedStone.x);
+    // console.log(placedStone.x);
     var pos = placedStone.x + 19 * placedStone.y;
+    // TODO check if it was this players turn, else we dont store the move
+    // TODO check if there already is a stone in that position - should this be on the client side or server side
+    if (board.data[pos]!= 0) {
+      console.log("A stone has already been placed in this spot")
+      return;
+    }
+    // TODO check if a stone is captured - server side
 
     // when you click confirm, it should store the right number at that position
 

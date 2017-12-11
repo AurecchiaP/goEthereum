@@ -6,16 +6,21 @@ contract GoGame {
 
   struct Game {
       uint[361] board;
-      byte state; // 0: ongoing, 1: owner won, 2: opponent won
+      uint state; // 0: ongoing, 1: owner won, 2: opponent won
       uint turn;  // 0: owner has to move, 1: opponent has to move
       bool ownerPassed; // 0 if not passed, 1 if it has passed last turn
       bool opponentPassed; // 0 if not passed, 1 if it has passed last turn
+      uint[] chain;
   }
 
   Game game;
 
   function GoGame(address gameOwner) public {
     owner = gameOwner;
+    game.board[ 10 + 19 * 2] = 2;
+    game.board[ 9 + 19 * 2] = 1;
+    game.board[ 10 + 19 * 1] = 1;
+    game.board[ 10 + 19 * 3] = 1;
   }
 
   function move(uint pos) public {
@@ -30,7 +35,8 @@ contract GoGame {
       game.board[pos] = game.turn;
       game.turn = game.turn % 2;
       game.ownerPassed = false;
-
+      /*TODO check if a stone was captured */
+      checkNeighbors(pos);
 
     } else if (game.turn == 1 && opponent == msg.sender) {
       /* TODO check validity of move */
@@ -38,6 +44,9 @@ contract GoGame {
       game.board[pos] = game.turn;
       game.turn = game.turn % 2;
       game.opponentPassed = false;
+      /*TODO check if a stone was captured */
+      checkNeighbors(pos);
+
     }
   }
 
@@ -61,11 +70,131 @@ contract GoGame {
     }
   }
 
+/* The first step to checking if a capture occured.
+    In this function, we check our neighbors to see if there is a stone of the
+    opposing side nearby. If such a stone is found, we look to see if it is in
+    a chain (capturing multiple stones). we then check if the stone(s) are
+    surrounded by stones of our colour. If yes, then those stones are captured;
+    if any of the stones in the chain have a free spot near it, they are not captured.
+*/
+  function checkNeighbors(uint myPosition) public {
+    uint x = myPosition%19;
+    uint y = (myPosition - (myPosition%19))/19;
+    uint myStoneType = game.board[myPosition];
+    uint positionToCheck;
+    uint i;
+    /*FIXME Redundant code */
+    /* check position to the left and right */
+    positionToCheck = (x-1)+(y*19);
+    for(i=0; i<2; i++){
+      if(game.board[positionToCheck]!= 0 && game.board[positionToCheck]!= myStoneType ){
+        /* found oponent's stone nearby, so now we check if oponent's stone can be captured */
+        game.chain.push(positionToCheck);
+        findChain(positionToCheck);
+        capture();
+        delete game.chain;
+
+      }
+      positionToCheck = (x+1)+(y*19);
+    }
+    /* check position to the top and bottom */
+    positionToCheck = (x)+((y-1)*19);
+    for(i=0; i<2; i++){
+      if(game.board[positionToCheck]!= 0 && game.board[positionToCheck]!= myStoneType ){
+        /* found oponent's stone nearby, so now we check if oponent's stone can be captured */
+        game.chain.push(positionToCheck);
+        findChain(positionToCheck);
+        capture();
+        delete game.chain;
+
+      }
+      positionToCheck = (x)+((y+1)*19);
+    }
+  }
+
+  /* we now just have to check if any stone in the chain has a liberty. if yes, we do nothing
+  else we delete the whole chain.
+  REVIEW: do we have to check the colours of the stone (technically if the stone had the same colour
+  it would be a part of the chain )
+   */
+  function capture() public{
+    uint i;
+    uint x;
+    uint y;
+    bool liberty = false;
+    uint up;
+    uint down;
+    uint left;
+    uint right;
+    for(i=0;i<game.chain.length; i++){
+      x = game.chain[i]%19;
+      y =(game.chain[i] - (game.chain[i]%19))/19;
+      up = (x)+((y-1)*19);
+      down = (x)+((y+1)*19);
+      left = (x-1)+(y*19);
+      right = (x+1)+(y*19);
+      if(game.board[up]== 0 || game.board[down] == 0 || game.board[left] == 0 || game.board[right] == 0){
+        liberty = true;
+        return;
+      }
+    }
+    if(liberty==false){
+      for(i=0;i<game.chain.length; i++){
+        game.board[game.chain[i]] = 0;
+      }
+    }
+  }
+
+  function findChain(uint startPos) public{
+    uint x = startPos%19;
+    uint y = (startPos - (startPos%19))/19;
+    uint stoneType = game.board[startPos];
+    if(y !=0){
+      uint up = (x)+((y-1)*19);
+      addStoneToChain(up, stoneType);
+    }
+    if( y != 19){
+      uint down = (x)+((y+1)*19);
+      addStoneToChain(down, stoneType);
+    }
+    if(x != 0){
+      uint left = (x-1)+(y*19);
+      addStoneToChain(left, stoneType);
+    }
+    if(x != 19){
+      uint right = (x+1)+(y*19);
+      addStoneToChain(right, stoneType);
+    }
+
+  }
+
+  function addStoneToChain(uint position, uint stoneType) public{
+    uint i;
+    bool added;
+    if(game.board[position] == stoneType && stoneType != 0){ // found a linked stone
+      /* check if the stone was already listed in the chain */
+      added = false;
+      for(i=0; i < game.chain.length; i++){
+        if(game.chain[i] == position){
+          added = true;
+        }
+      }
+      if(added==false){
+        game.chain.push(position); // is this wrong?
+        findChain(position);
+      }
+    }
+  }
+
   function getBoard() public view returns (uint[361]) {
     return game.board;
   }
 
-  function getData() public view returns (address, address, uint, byte) {
+  function getChain() public view returns (uint[]){
+    return game.chain;
+  }
+
+  function getData() public view returns (address, address, uint, uint) {
     return (owner, opponent, game.turn, game.state);
   }
 
