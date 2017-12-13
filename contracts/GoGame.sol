@@ -5,12 +5,11 @@ contract GoGame {
   address public opponent;
 
   struct Game {
-      uint[361] board;
-      uint state; // 0: ongoing, 1: owner won, 2: opponent won
-      uint turn;  // 0: owner has to move, 1: opponent has to move
+      uint8[361] board;
+      uint8 state; // 0: ongoing, 1: owner won, 2: opponent won
+      uint8 turn;  // 0: owner has to move, 1: opponent has to move
       bool ownerPassed; // 0 if not passed, 1 if it has passed last turn
       bool opponentPassed; // 0 if not passed, 1 if it has passed last turn
-      /*uint[] chain;*/
   }
 
   Game game;
@@ -34,35 +33,50 @@ contract GoGame {
     game.board[ 11 + 19 * 4] = 1;
     game.board[ 10 + 19 * 3] = 2;
     game.board[ 10 + 19 * 4] = 2;
+
+    game.board[ 11 + 19 * 5] = 1;
+    game.board[ 10 + 19 * 5] = 2;
+    game.board[ 9 + 19 * 5] = 1;
+
+    game.board[ 11 + 19 * 6] = 1;
+    game.board[ 10 + 19 * 6] = 2;
+    game.board[ 9 + 19 * 6] = 1;
+
+    game.board[ 11 + 19 * 7] = 1;
+    game.board[ 10 + 19 * 7] = 2;
+    game.board[ 9 + 19 * 7] = 1;
+
+    game.board[ 11 + 19 * 8] = 1;
+    game.board[ 10 + 19 * 8] = 2;
+    game.board[ 9 + 19 * 8] = 1;
   }
 
-  function move(uint pos) public {
+  /* handles the move of a player */
+  function move(uint16 pos) public {
+    if(game.board[pos] != 0){
+      return;
+    }
+
     if(msg.sender != owner && opponent == 0) {
       opponent = msg.sender;
     }
+
     if (game.turn == 0 && owner == msg.sender) {
-      /* TODO check validity of move */
-      /* +1 because its the next turn */
       game.turn = game.turn + 1;
-      /* +1 because 0 is empty, 1 is p1, 2 is p2 */
       game.board[pos] = game.turn;
       game.turn = game.turn % 2;
       game.ownerPassed = false;
-      /*TODO check if a stone was captured */
       checkNeighbors(pos);
-
     } else if (game.turn == 1 && opponent == msg.sender) {
-      /* TODO check validity of move */
       game.turn = game.turn + 1;
       game.board[pos] = game.turn;
       game.turn = game.turn % 2;
       game.opponentPassed = false;
-      /*TODO check if a stone was captured */
       checkNeighbors(pos);
 
     }
   }
-
+  /* handles the passing of a turn of a player */
   function pass() public {
     if(msg.sender != owner && opponent == 0) {
       opponent = msg.sender;
@@ -83,36 +97,32 @@ contract GoGame {
     }
   }
 
-/* The first step to checking if a capture occured.
-    In this function, we check our neighbors to see if there is a stone of the
-    opposing side nearby. If such a stone is found, we look to see if it is in
-    a chain (capturing multiple stones). we then check if the stone(s) are
-    surrounded by stones of our colour. If yes, then those stones are captured;
-    if any of the stones in the chain have a free spot near it, they are not captured.
-*/
-  function checkNeighbors(uint myPosition) public {
-    /* FIXME wrong stone type */
-    uint color;
+  /*  checks if the 4 neighbors (N,S,W,E) are of our same color(i.e. part of the
+      same chain) */
+  function checkNeighbors(uint16 myPosition) public {
+    uint8 color;
     if(game.board[myPosition] == 1) {
       color = 2;
     } else {
       color = 1;
     }
 
+    /* FIXME check for out of bounds */
     check(myPosition - 19, color);
     check(myPosition + 19, color);
     check(myPosition - 1, color);
     check(myPosition + 1, color);
   }
 
-  function check (uint position, uint color) private {
+  /* returns the current board of the game */
+  function check (uint16 position, uint8 color) private {
     if(game.board[position] == color) {
-      uint[361] memory visited;
-      uint[361] memory seen;
-      uint visitedHead;
-      uint seenHead;
-      uint i;
-      uint j;
+      uint16[361] memory visited;
+      uint16[361] memory seen;
+      uint16 visitedHead;
+      uint16 seenHead;
+      uint16 i;
+      uint16 j;
       bool liberty;
       bool alreadyVisited;
       i = 0;
@@ -197,28 +207,13 @@ contract GoGame {
     }
   }
 
-  function getBoard() public view returns (uint[361]) {
+  /* returns the current board of the game */
+  function getBoard() public view returns (uint8[361]) {
     return game.board;
   }
 
-  /*function getChain() public view returns (uint[]){
-    return chain;
-  }*/
-
-  function getData() public view returns (address, address, uint, uint) {
+  /* returns information on the game */
+  function getData() public view returns (address, address, uint8, uint8) {
     return (owner, opponent, game.turn, game.state);
-  }
-
-  function setVariable(uint pos) public {
-    if(pos < 361) {
-      game.board[pos] = 1;
-    }
-  }
-
-  function getMove(uint pos) public pure returns(uint) {
-    if(pos < 361) {
-      return pos;
-    }
-    return 404; // illegal position
   }
 }
