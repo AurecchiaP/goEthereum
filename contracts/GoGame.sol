@@ -51,34 +51,9 @@ contract GoGame {
     game.board[ 9 + 19 * 8] = 1;
   }
 
-  /* handles the move of a player */
-  function move(uint16 pos) public {
-    if(game.board[pos] != 0){
-      return;
-    }
-
-    if(msg.sender != owner && opponent == 0) {
-      opponent = msg.sender;
-    }
-
-    if (game.turn == 0 && owner == msg.sender) {
-      game.turn = game.turn + 1;
-      game.board[pos] = game.turn;
-      game.turn = game.turn % 2;
-      game.ownerPassed = false;
-      checkNeighbors(pos);
-    } else if (game.turn == 1 && opponent == msg.sender) {
-      game.turn = game.turn + 1;
-      game.board[pos] = game.turn;
-      game.turn = game.turn % 2;
-      game.opponentPassed = false;
-      checkNeighbors(pos);
-
-    }
-  }
   /* handles the passing of a turn of a player */
   function pass() public {
-    if(msg.sender != owner && opponent == 0) {
+    if (msg.sender != owner && opponent == 0) {
       opponent = msg.sender;
     }
     if (game.turn == 0 && owner == msg.sender) {
@@ -91,17 +66,43 @@ contract GoGame {
       game.turn = (game.turn + 1) % 2;
     }
 
-    if(game.ownerPassed && game.opponentPassed) {
+    if (game.ownerPassed && game.opponentPassed) {
       /* TODO check who won and set 1 or 2 */
       game.state = 1;
     }
   }
 
-  /*  checks if the 4 neighbors (N,S,W,E) are of our same color(i.e. part of the
-      same chain) */
+  /* handles the move of a player */
+  function move(uint16 pos) public {
+    if (game.board[pos] != 0){
+      return;
+    }
+
+    if (msg.sender != owner && opponent == 0) {
+      opponent = msg.sender;
+    }
+
+    if (game.turn == 0 && owner == msg.sender) {
+      game.turn = game.turn + 1;
+      game.board[pos] = game.turn;
+      game.turn = game.turn % 2;
+      game,..ownerPassed = false;
+      checkNeighbors(pos);
+    } else if (game.turn == 1 && opponent == msg.sender) {
+      game.turn = game.turn + 1;
+      game.board[pos] = game.turn;
+      game.turn = game.turn % 2;
+      game.opponentPassed = false;
+      checkNeighbors(pos);
+    }
+
+  }
+
+  /* checks if the 4 neighbors (N,S,W,E) are of our same color(i.e. part of the
+     same chain) */
   function checkNeighbors(uint16 myPosition) public {
     uint8 color;
-    if(game.board[myPosition] == 1) {
+    if (game.board[myPosition] == 1) {
       color = 2;
     } else {
       color = 1;
@@ -115,8 +116,8 @@ contract GoGame {
   }
 
   /* returns the current board of the game */
-  function check (uint16 position, uint8 color) private {
-    if(game.board[position] == color) {
+  function check(uint16 position, uint8 color) private {
+    if (game.board[position] == color) {
       uint16[361] memory visited;
       uint16[361] memory seen;
       uint16 visitedHead;
@@ -128,19 +129,19 @@ contract GoGame {
       i = 0;
       liberty = false;
       seen[seenHead++] = position;
-      while(i < seenHead) {
+      while (i < seenHead) {
         position = seen[i++];
 
         // CHECK TOP
-        if(game.board[position - 19] == color) {
+        if (game.board[position - 19] == color) {
           alreadyVisited = false;
-          for(j=0; j < visitedHead; j++) {
-            if(visited[j] == position - 19) {
+          for (j=0; j < visitedHead; j++) {
+            if (visited[j] == position - 19) {
               alreadyVisited = true;
               break;
             }
           }
-          if(!alreadyVisited) {
+          if (!alreadyVisited) {
             seen[seenHead++] = position - 19;
           }
         } else if (liberty == false && game.board[position - 19] == 0) {
@@ -148,15 +149,15 @@ contract GoGame {
         }
 
         // CHECK BOTTOM
-        if(game.board[position + 19] == color) {
+        if (game.board[position + 19] == color) {
           alreadyVisited = false;
-          for(j=0; j < visitedHead; j++) {
-            if(visited[j] == position + 19) {
+          for (j=0; j < visitedHead; j++) {
+            if (visited[j] == position + 19) {
               alreadyVisited = true;
               break;
             }
           }
-          if(!alreadyVisited) {
+          if (!alreadyVisited) {
             seen[seenHead++] = position + 19;
           }
         } else if (liberty == false && game.board[position + 19] == 0) {
@@ -164,15 +165,15 @@ contract GoGame {
         }
 
         // CHECK LEFT
-        if(game.board[position - 1] == color) {
+        if (game.board[position - 1] == color) {
           alreadyVisited = false;
-          for(j=0; j < visitedHead; j++) {
-            if(visited[j] == position - 1) {
+          for (j = 0; j < visitedHead; j++) {
+            if (visited[j] == position - 1) {
               alreadyVisited = true;
               break;
             }
           }
-          if(!alreadyVisited) {
+          if (!alreadyVisited) {
             seen[seenHead++] = position - 1;
           }
         } else if (liberty == false && game.board[position - 1] == 0) {
@@ -180,31 +181,43 @@ contract GoGame {
         }
 
         // CHECK RIGHT
-        if(game.board[position + 1] == color) {
+        if (game.board[position + 1] == color) {
           alreadyVisited = false;
-          for(j=0; j < visitedHead; j++) {
-            if(visited[j] == position + 1) {
+          for (j = 0; j < visitedHead; j++) {
+            if (visited[j] == position + 1) {
               alreadyVisited = true;
               break;
             }
           }
-          if(!alreadyVisited) {
+          if (!alreadyVisited) {
             seen[seenHead++] = position + 1;
           }
         } else if (liberty == false && game.board[position + 1] == 0) {
           liberty = true;
         }
 
-
         visited[visitedHead++] = position;
       }
 
-      if(liberty == false) {
-        for(i = 0; i < visitedHead; i++) {
+      if (liberty == false) {
+        for (i = 0; i < visitedHead; i++) {
           game.board[visited[i]] = 0;
         }
       }
     }
+  }
+
+  /* calculates the area of the two players and returns the winner */
+  function checkWinner() private returns (bool) {
+    uint area1;
+    uint area2;
+
+    /* find empty areas (value 0 in the board), and find the whole "chain",
+    which is the adjacent empty cells. When going through these areas,
+    check if they're adjacent to only white, black, or both. */
+
+
+
   }
 
   /* returns the current board of the game */
@@ -212,7 +225,7 @@ contract GoGame {
     return game.board;
   }
 
-  /* returns information on the game */
+  /* returns infor mation on the game */
   function getData() public view returns (address, address, uint8, uint8) {
     return (owner, opponent, game.turn, game.state);
   }
