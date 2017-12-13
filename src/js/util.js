@@ -18,6 +18,8 @@ class Board {
   }
 }
 
+var turn;
+
 var boardDiv = $('#board');
 
 var placedStone = new Stone(-1, -1, 'white');

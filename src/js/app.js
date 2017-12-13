@@ -136,8 +136,9 @@ App = {
               // sometimes promises don't give back the updated data, so
               // knowing the move we do it manually
               // +1 because 0 stands for empty, 1 and 2 for placed stones
-              console.log(res)
-              board.data[pos].c[0] = res[1].c[0] + 1;
+              if(board.data[pos].c[0] == 0) {
+                board.data[pos].c[0] = board.turn + 1;
+              }
               App.loadBoard();
             });
         })
@@ -240,6 +241,8 @@ App = {
                 App.contracts.Games[i] = App.contracts.Games[i].at(game);
                 App.contracts.Games[i].getData.call()
                   .then(function(res) {
+                    board.turn = res[2].c[0];
+                    console.log(board.turn)
                     gamesData[i] = res;
                     App.selectGame(i);
                   })

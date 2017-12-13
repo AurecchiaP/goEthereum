@@ -41,6 +41,11 @@ body {
   background-size: contain;
 }
 
+.blue {
+  background: url(../images/blue.svg) no-repeat top left;
+  background-size: contain;
+}
+
 /* black stones (set background image) */
 
 .black {
@@ -48,8 +53,12 @@ body {
   background-size: contain;
 }
 
-#hoverStone, #placedStone {
+#hoverStone {
   opacity: .5;
+  display: none;
+}
+
+#placedStone {
   display: none;
 }
 
