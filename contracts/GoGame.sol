@@ -19,7 +19,14 @@ contract GoGame {
     owner = gameOwner;
     game.board[ 10 + 19 * 2] = 2;
     game.board[ 9 + 19 * 2] = 1;
-    game.board[ 9 + 19 * 3] = 1;
+    game.board[ 9 + 19 * 3] = 2;
+    game.board[ 8 + 19 * 3] = 2;
+    game.board[ 8 + 19 * 2] = 1;
+    game.board[ 8 + 19 * 4] = 1;
+    game.board[ 7 + 19 * 2] = 1;
+    game.board[ 7 + 19 * 4] = 1;
+    game.board[ 7 + 19 * 3] = 2;
+    game.board[ 6 + 19 * 3] = 1;
     game.board[ 9 + 19 * 4] = 1;
     game.board[ 10 + 19 * 1] = 1;
     game.board[ 11 + 19 * 2] = 1;
@@ -84,119 +91,108 @@ contract GoGame {
     if any of the stones in the chain have a free spot near it, they are not captured.
 */
   function checkNeighbors(uint myPosition) public {
-    uint x = myPosition%19;
-    uint y = (myPosition - (myPosition%19))/19;
-    uint myStoneType = game.board[myPosition];
-    uint positionToCheck;
-    uint i;
-
-    uint[361] memory chain;
-    uint chainHead = 0;
-
-    /*FIXME Redundant code */
-    /* check position to the left and right */
-    positionToCheck = (x-1)+(y*19);
-    for(i=0; i<2; i++){
-      if (game.board[positionToCheck]!= 0 && game.board[positionToCheck]!= myStoneType) {
-        /* found oponent's stone nearby, so now we check if oponent's stone can be captured */
-        chain[chainHead] = positionToCheck;
-        chainHead = chainHead + 1;
-        findChain(chain, chainHead, positionToCheck);
-        capture(chain, chainHead);
-        delete chain;
-        chainHead = 0;
-
-      }
-      positionToCheck = (x+1)+(y*19);
+    /* FIXME wrong stone type */
+    uint color;
+    if(game.board[myPosition] == 1) {
+      color = 2;
+    } else {
+      color = 1;
     }
-    /* check position to the top and bottom */
-    positionToCheck = (x)+((y-1)*19);
-    for(i=0; i<2; i++){
-      if (game.board[positionToCheck]!= 0 && game.board[positionToCheck]!= myStoneType) {
-        /* found oponent's stone nearby, so now we check if oponent's stone can be captured */
-        chain[chainHead] = positionToCheck;
-        chainHead = chainHead + 1;
-        findChain(chain, chainHead, positionToCheck);
-        capture(chain, chainHead);
-        delete chain;
-        chainHead = 0;
 
-      }
-      positionToCheck = (x)+((y+1)*19);
-    }
+    check(myPosition - 19, color);
+    check(myPosition + 19, color);
+    check(myPosition - 1, color);
+    check(myPosition + 1, color);
   }
 
-  /* we now just have to check if any stone in the chain has a liberty. if yes, we do nothing
-  else we delete the whole chain.
-  REVIEW: do we have to check the colours of the stone (technically if the stone had the same colour
-  it would be a part of the chain )
-   */
-  function capture(uint[361] memory chain, uint chainHead) public {
-    uint i;
-    uint x;
-    uint y;
-    bool liberty = false;
-    uint up;
-    uint down;
-    uint left;
-    uint right;
-    for(i=0;i<chainHead; i++){
-      x = chain[i]%19;
-      y =(chain[i] - (chain[i]%19))/19;
-      up = (x)+((y-1)*19);
-      down = (x)+((y+1)*19);
-      left = (x-1)+(y*19);
-      right = (x+1)+(y*19);
-      if(game.board[up] == 0 || game.board[down] == 0 || game.board[left] == 0 || game.board[right] == 0){
-        liberty = true;
-        return;
-      }
-    }
-    if(liberty==false){
-      for(i=0;i<chainHead; i++){
-        game.board[chain[i]] = 0;
-      }
-    }
-  }
+  function check (uint position, uint color) private {
+    if(game.board[position] == color) {
+      uint[361] memory visited;
+      uint[361] memory seen;
+      uint visitedHead;
+      uint seenHead;
+      uint i;
+      uint j;
+      bool liberty;
+      bool alreadyVisited;
+      i = 0;
+      liberty = false;
+      seen[seenHead++] = position;
+      while(i < seenHead) {
+        position = seen[i++];
 
-  function findChain(uint[361] memory chain, uint chainHead, uint startPos) public {
-    uint x = startPos%19;
-    uint y = (startPos - (startPos%19))/19;
-    uint stoneType = game.board[startPos];
-    if(y !=0){
-      uint up = (x)+((y-1)*19);
-      addStoneToChain(chain, chainHead, up, stoneType);
-    }
-    if( y != 19){
-      uint down = (x)+((y+1)*19);
-      addStoneToChain(chain, chainHead, down, stoneType);
-    }
-    if(x != 0){
-      uint left = (x-1)+(y*19);
-      addStoneToChain(chain, chainHead, left, stoneType);
-    }
-    if(x != 19){
-      uint right = (x+1)+(y*19);
-      addStoneToChain(chain, chainHead, right, stoneType);
-    }
-
-  }
-
-  function addStoneToChain(uint[361] memory chain, uint chainHead, uint position, uint stoneType) public {
-    uint i;
-    bool added;
-    if(game.board[position] == stoneType && stoneType != 0){ // found a linked stone
-      /* check if the stone was already listed in the chain */
-      added = false;
-      for(i=0; i < chainHead; i++){
-        if(chain[i] == position){
-          added = true;
+        // CHECK TOP
+        if(game.board[position - 19] == color) {
+          alreadyVisited = false;
+          for(j=0; j < visitedHead; j++) {
+            if(visited[j] == position - 19) {
+              alreadyVisited = true;
+              break;
+            }
+          }
+          if(!alreadyVisited) {
+            seen[seenHead++] = position - 19;
+          }
+        } else if (liberty == false && game.board[position - 19] == 0) {
+          liberty = true;
         }
+
+        // CHECK BOTTOM
+        if(game.board[position + 19] == color) {
+          alreadyVisited = false;
+          for(j=0; j < visitedHead; j++) {
+            if(visited[j] == position + 19) {
+              alreadyVisited = true;
+              break;
+            }
+          }
+          if(!alreadyVisited) {
+            seen[seenHead++] = position + 19;
+          }
+        } else if (liberty == false && game.board[position + 19] == 0) {
+          liberty = true;
+        }
+
+        // CHECK LEFT
+        if(game.board[position - 1] == color) {
+          alreadyVisited = false;
+          for(j=0; j < visitedHead; j++) {
+            if(visited[j] == position - 1) {
+              alreadyVisited = true;
+              break;
+            }
+          }
+          if(!alreadyVisited) {
+            seen[seenHead++] = position - 1;
+          }
+        } else if (liberty == false && game.board[position - 1] == 0) {
+          liberty = true;
+        }
+
+        // CHECK RIGHT
+        if(game.board[position + 1] == color) {
+          alreadyVisited = false;
+          for(j=0; j < visitedHead; j++) {
+            if(visited[j] == position + 1) {
+              alreadyVisited = true;
+              break;
+            }
+          }
+          if(!alreadyVisited) {
+            seen[seenHead++] = position + 1;
+          }
+        } else if (liberty == false && game.board[position + 1] == 0) {
+          liberty = true;
+        }
+
+
+        visited[visitedHead++] = position;
       }
-      if(added==false){
-        chain[chainHead] = position;
-        chainHead = chainHead + 1;
-        findChain(chain, chainHead, position);
+
+      if(liberty == false) {
+        for(i = 0; i < visitedHead; i++) {
+          game.board[visited[i]] = 0;
+        }
       }
     }
   }
