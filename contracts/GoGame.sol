@@ -224,22 +224,22 @@ contract GoGame {
     }
   }
 
-  function checkSimpleWinner() private{
+  function checkSimpleWinner() private {
     uint score1 = 0;
     uint score2 = 0;
-    uint i;
+    uint16 i;
     uint8 color;
-    for (i=0; i < 362; i++){
+    for (i = 0; i < 361; i++) {
       color = game.board[i];
-      if(color == 1){
+      if (color == 1) {
         score1++;
-      }else if (color == 2){
+      } else if (color == 2) {
         score2++;
       }
     }
-    if (score1 < score2){
+    if (score1 < score2) {
       game.state = 2;
-    }else{
+    } else {
       game.state = 1;
     }
   }
