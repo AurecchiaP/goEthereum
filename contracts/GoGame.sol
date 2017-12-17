@@ -53,6 +53,7 @@ contract GoGame {
 
   /* handles the passing of a turn of a player */
   function pass() public {
+    /* bool player2won = false; */
     if (msg.sender != owner && opponent == 0) {
       opponent = msg.sender;
     }
@@ -68,7 +69,12 @@ contract GoGame {
 
     if (game.ownerPassed && game.opponentPassed) {
       /* TODO check who won and set 1 or 2 */
-      game.state = 1;
+      checkSimpleWinner();
+      /* if (player2won){
+        game.state = 2;
+      }else {
+        game.state = 1;
+      } */
     }
   }
 
@@ -86,7 +92,7 @@ contract GoGame {
       game.turn = game.turn + 1;
       game.board[pos] = game.turn;
       game.turn = game.turn % 2;
-      game,..ownerPassed = false;
+      game.ownerPassed = false;
       checkNeighbors(pos);
     } else if (game.turn == 1 && opponent == msg.sender) {
       game.turn = game.turn + 1;
@@ -107,12 +113,19 @@ contract GoGame {
     } else {
       color = 1;
     }
-
-    /* FIXME check for out of bounds */
-    check(myPosition - 19, color);
-    check(myPosition + 19, color);
-    check(myPosition - 1, color);
-    check(myPosition + 1, color);
+    /* if we arent on the top row */
+    if (myPosition > 18){
+      check(myPosition - 19, color); // up
+    }
+    if (myPosition < 342){
+      check(myPosition + 19, color); // down
+    }
+    if (myPosition % 19 != 0){
+      check(myPosition - 1, color); // left
+    }
+    if (myPosition % 19 != 18){
+      check(myPosition + 1, color); // right
+    }
   }
 
   /* returns the current board of the game */
@@ -133,69 +146,73 @@ contract GoGame {
         position = seen[i++];
 
         // CHECK TOP
-        if (game.board[position - 19] == color) {
-          alreadyVisited = false;
-          for (j=0; j < visitedHead; j++) {
-            if (visited[j] == position - 19) {
-              alreadyVisited = true;
-              break;
+        if (position > 18){
+          if (game.board[position - 19] == color) {
+            alreadyVisited = false;
+            for (j=0; j < visitedHead; j++) {
+              if (visited[j] == position - 19) {
+                alreadyVisited = true;
+                break;
+              }
             }
+            if (!alreadyVisited) {
+              seen[seenHead++] = position - 19;
+            }
+          } else if (liberty == false && game.board[position - 19] == 0) {
+            liberty = true;
           }
-          if (!alreadyVisited) {
-            seen[seenHead++] = position - 19;
-          }
-        } else if (liberty == false && game.board[position - 19] == 0) {
-          liberty = true;
         }
-
         // CHECK BOTTOM
-        if (game.board[position + 19] == color) {
-          alreadyVisited = false;
-          for (j=0; j < visitedHead; j++) {
-            if (visited[j] == position + 19) {
-              alreadyVisited = true;
-              break;
+        if (position < 342){
+          if (game.board[position + 19] == color) {
+            alreadyVisited = false;
+            for (j=0; j < visitedHead; j++) {
+              if (visited[j] == position + 19) {
+                alreadyVisited = true;
+                break;
+              }
             }
+            if (!alreadyVisited) {
+              seen[seenHead++] = position + 19;
+            }
+          } else if (liberty == false && game.board[position + 19] == 0) {
+            liberty = true;
           }
-          if (!alreadyVisited) {
-            seen[seenHead++] = position + 19;
-          }
-        } else if (liberty == false && game.board[position + 19] == 0) {
-          liberty = true;
         }
-
         // CHECK LEFT
-        if (game.board[position - 1] == color) {
-          alreadyVisited = false;
-          for (j = 0; j < visitedHead; j++) {
-            if (visited[j] == position - 1) {
-              alreadyVisited = true;
-              break;
+        if (position % 19 != 0){
+          if (game.board[position - 1] == color) {
+            alreadyVisited = false;
+            for (j = 0; j < visitedHead; j++) {
+              if (visited[j] == position - 1) {
+                alreadyVisited = true;
+                break;
+              }
             }
+            if (!alreadyVisited) {
+              seen[seenHead++] = position - 1;
+            }
+          } else if (liberty == false && game.board[position - 1] == 0) {
+            liberty = true;
           }
-          if (!alreadyVisited) {
-            seen[seenHead++] = position - 1;
-          }
-        } else if (liberty == false && game.board[position - 1] == 0) {
-          liberty = true;
         }
-
         // CHECK RIGHT
-        if (game.board[position + 1] == color) {
-          alreadyVisited = false;
-          for (j = 0; j < visitedHead; j++) {
-            if (visited[j] == position + 1) {
-              alreadyVisited = true;
-              break;
+        if (position % 19 != 18){
+          if (game.board[position + 1] == color) {
+            alreadyVisited = false;
+            for (j = 0; j < visitedHead; j++) {
+              if (visited[j] == position + 1) {
+                alreadyVisited = true;
+                break;
+              }
             }
+            if (!alreadyVisited) {
+              seen[seenHead++] = position + 1;
+            }
+          } else if (liberty == false && game.board[position + 1] == 0) {
+            liberty = true;
           }
-          if (!alreadyVisited) {
-            seen[seenHead++] = position + 1;
-          }
-        } else if (liberty == false && game.board[position + 1] == 0) {
-          liberty = true;
         }
-
         visited[visitedHead++] = position;
       }
 
@@ -207,17 +224,24 @@ contract GoGame {
     }
   }
 
-  /* calculates the area of the two players and returns the winner */
-  function checkWinner() private returns (bool) {
-    uint area1;
-    uint area2;
-
-    /* find empty areas (value 0 in the board), and find the whole "chain",
-    which is the adjacent empty cells. When going through these areas,
-    check if they're adjacent to only white, black, or both. */
-
-
-
+  function checkSimpleWinner() private{
+    uint score1 = 0;
+    uint score2 = 0;
+    uint i;
+    uint8 color;
+    for (i=0; i < 362; i++){
+      color = game.board[i];
+      if(color == 1){
+        score1++;
+      }else if (color == 2){
+        score2++;
+      }
+    }
+    if (score1 < score2){
+      game.state = 2;
+    }else{
+      game.state = 1;
+    }
   }
 
   /* returns the current board of the game */

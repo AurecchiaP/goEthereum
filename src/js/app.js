@@ -171,6 +171,7 @@ App = {
         .then(function(res) {
           console.log('passed');
           console.log(res);
+          console.log(gamesData[index][3]);
           $('#loader').fadeToggle('fast');
         })
         .catch(function(err) {
