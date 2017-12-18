@@ -245,7 +245,7 @@ App = {
             gamesData[i] = res;
             let turn = gamesData[i][2].c[0] == 0 ? 'owner' : 'opponent';
             let state = gamesData[i][3] == 0 ? 'ongoing' : gamesData[i][3] == 1 ? '1 won' : '2 won';
-            item = $('<a href="#" id="game-' + i + '" class="game-item list-group-item list-group-item-action flex-column align-items-start"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1">Ongoing</h5><small>state: ' + state + '</small></div><p class="mb-1">' + gamesData[i][0] + ' vs ' + gamesData[i][1] + '</p><small>turn: ' + turn + '</small></a>');
+            item = $('<a href="#" id="game-' + i + '" class="game-item list-group-item list-group-item-action flex-column align-items-start"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1">Game ' + (i+1) + '</h5><small>state: ' + state + '</small></div><p class="mb-1">' + gamesData[i][0] + ' vs ' + gamesData[i][1] + '</p><small>turn: ' + turn + '</small></a>');
             item.hide();
             item.on('click', this, function(event) {
               $('#loader').fadeToggle('fast');
