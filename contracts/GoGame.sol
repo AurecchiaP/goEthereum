@@ -70,17 +70,30 @@ contract GoGame {
     if (game.ownerPassed && game.opponentPassed) {
       /* TODO check who won and set 1 or 2 */
       checkSimpleWinner();
-      /* if (player2won){
-        game.state = 2;
-      }else {
-        game.state = 1;
-      } */
+      /* checkWinner(); */
     }
   }
 
   /* handles the move of a player */
   function move(uint16 pos) public {
+    bool liberty = false;
+    if (game.state != 0) {
+      return;
+    }
     if (game.board[pos] != 0){
+      return;
+    }
+    if(pos > 18 && game.board[pos - 19] == 0 ) {
+      liberty = true;
+    } else if (pos < 342 && game.board[pos + 19] == 0) {
+      liberty = true;
+    } else if (pos % 19 != 0 && game.board[pos - 1] == 0) {
+      liberty = true;
+    } else if (pos % 19 != 18 && game.board[pos + 1] == 0) {
+      liberty = true;
+    }
+
+    if (!liberty) {
       return;
     }
 
@@ -243,6 +256,150 @@ contract GoGame {
       game.state = 1;
     }
   }
+
+  /* calculates the area of the two players and returns the winner */
+  function checkWinner() private {
+  /* find empty areas (value 0 in the board), and find the whole "chain",
+  which is the adjacent empty cells. When going through these areas,
+  check if they're adjacent to only white, black, or both. */
+    uint area1 = 0;
+    uint area2 = 0;
+    uint16[361] memory visited;
+    uint16[361] memory seen;
+    uint16 visitedHead = 0;
+    uint16 visitedTail = 0;
+    uint16 seenHead;
+    uint16 seenTail;
+    uint16 i;
+    uint16 position;
+    uint16 j;
+    bool sawBothColors; // are we surrounded by only one color
+    bool sawOneColor;
+    bool alreadyVisited;
+    uint8 color;
+    for (i = 0; i < 361; i++) {
+      for (j = 0; j < visitedHead; j++) {
+        if (visited[j] == i) {
+          alreadyVisited = true;
+          break;
+        }
+      }
+      if (!alreadyVisited && game.board[i] == 0) {
+        sawBothColors = false;
+        sawOneColor = false;
+        color = 0;
+        seenHead = 0;
+        seenTail = 0;
+        visitedTail = visitedHead;
+        seen[seenHead++] = i;
+        while (seenTail < seenHead){
+          position = seen[seenTail++];
+          // CHECK TOP
+          if (position > 18){
+            if (game.board[position - 19] == 0) {
+              alreadyVisited = false;
+              for (j=0; j < visitedHead; j++) {
+                if (visited[j] == position - 19) {
+                  alreadyVisited = true;
+                  break;
+                }
+              }
+              if (!alreadyVisited) {
+                seen[seenHead++] = position - 19;
+              }
+            }else{
+              if (sawOneColor == false){
+                color = game.board[position -19];
+                sawOneColor = true;
+              }else if (sawOneColor == true && color != game.board[position - 19]){
+                sawBothColors = true;
+              }
+            }
+          }
+          // CHECK BOTTOM
+          if (position < 342){
+            if (game.board[position + 19] == 0) {
+              alreadyVisited = false;
+              for (j=0; j < visitedHead; j++) {
+                if (visited[j] == position + 19) {
+                  alreadyVisited = true;
+                  break;
+                }
+              }
+              if (!alreadyVisited) {
+                seen[seenHead++] = position + 19;
+              }
+            }else{
+              if (sawOneColor == false){
+                color = game.board[position +19];
+                sawOneColor = true;
+              }else if (sawOneColor == true && color != game.board[position +19]){
+                sawBothColors = true;
+              }
+            }
+          }
+          // CHECK LEFT
+          if (position % 19 != 0){
+            if (game.board[position - 1] == 0) {
+              alreadyVisited = false;
+              for (j = 0; j < visitedHead; j++) {
+                if (visited[j] == position - 1) {
+                  alreadyVisited = true;
+                  break;
+                }
+              }
+              if (!alreadyVisited) {
+                seen[seenHead++] = position - 1;
+              }
+            } else{
+              if (sawOneColor == false){
+                color = game.board[position -1];
+                sawOneColor = true;
+              }else if (sawOneColor == true && color != game.board[position -1]){
+                sawBothColors = true;
+              }
+            }
+          }
+          // CHECK RIGHT
+          if (position % 19 != 18){
+            if (game.board[position + 1] == 0) {
+              alreadyVisited = false;
+              for (j = 0; j < visitedHead; j++) {
+                if (visited[j] == position + 1) {
+                  alreadyVisited = true;
+                  break;
+                }
+              }
+              if (!alreadyVisited) {
+                seen[seenHead++] = position + 1;
+              }
+            } else{
+              if (sawOneColor == false){
+                color = game.board[position +1];
+                sawOneColor = true;
+              }else if (sawOneColor == true && color != game.board[position + 1]){
+                sawBothColors = true;
+              }
+            }
+          }
+          visited[visitedHead++] = position;
+        }
+        if (sawBothColors == false) {
+          if (color == 1) {
+            area1 += (visitedHead - visitedTail);
+          } else if (color == 2) {
+            area2 += (visitedHead - visitedTail);
+          }
+        }
+      }
+    }
+    if (area1 < area2) {
+      game.state = 2;
+    } else {
+      game.state = 1;
+    }
+  }
+
 
   /* returns the current board of the game */
   function getBoard() public view returns (uint8[361]) {

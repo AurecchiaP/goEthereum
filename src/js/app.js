@@ -96,6 +96,8 @@ App = {
       }
     }
     $('#loader').fadeToggle('fast');
+    $('#invalidMove').hide();
+    $("#noGameSelected").hide();
   },
 
   handleMove: function(event) {
@@ -104,9 +106,12 @@ App = {
     // get the current position of the stone
     // console.log(placedStone.x);
     var pos = placedStone.x + 19 * placedStone.y;
-    // TODO check if it was this players turn, else we dont store the move
-    // TODO check if there already is a stone in that position - should this be on the client side or server side
+
     if (board.data[pos]!= 0) {
+      $("#invalidMove").show();
+      $('.close').click(function() {
+         $('#invalidMove').hide();
+      })
       console.log("A stone has already been placed in this spot")
       return;
     }
@@ -116,10 +121,15 @@ App = {
 
     if (!selectedGameAddress) {
       console.log("no selected game");
+      $("#noGameSelected").show();
+      $('.close').click(function() {
+         $('#noGameSelected').hide();
+      })
       return;
     }
 
     $('#loader').fadeToggle('fast');
+
 
     web3.eth.getAccounts(function(error, accounts) {
       if (error) {
@@ -157,6 +167,10 @@ App = {
     if (!selectedGameAddress) {
       console.log("no selected game");
       $('#loader').fadeToggle('fast');
+      $("#noGameSelected").show();
+      $('.close').click(function() {
+         $('#noGameSelected').hide();
+      })
       return;
     }
 
@@ -171,12 +185,31 @@ App = {
         .then(function(res) {
           console.log('passed');
           console.log(res);
-          console.log(gamesData[index][3]);
+          if (gamesData[index][3] == 1) {
+            console.log("the winner is player 1");
+            $("#winner1").show();
+            $('#moveButton').css({
+              display: 'none'
+            });
+            $('#passButton').css({
+              display: 'none'
+            });
+          } else if (gamesData[index][3] == 2) {
+            console.log("the winner is player 2");
+            $("#winner2").show();
+            $('#moveButton').css({
+              display: 'none'
+            });
+            $('#passButton').css({
+              display: 'none'
+            });
+          }
           $('#loader').fadeToggle('fast');
         })
         .catch(function(err) {
           console.log(err.message);
           $('#loader').fadeToggle('fast');
+
         })
     });
 
@@ -272,6 +305,35 @@ App = {
       .then(function(res) {
         board.data = res;
         App.loadBoard();
+        if (gamesData[index][3] == 0) {
+          $('#winner1').hide();
+          $('#winner2').hide();
+          $('#moveButton').css({
+            display: 'inline-block'
+          });
+          $('#passButton').css({
+            display: 'inline-block'
+          });
+        } else if (gamesData[index][3] == 1) {
+          $('#winner1').show();
+          $('#winner2').hide();
+          $('#moveButton').css({
+            display: 'none'
+          });
+          $('#passButton').css({
+            display: 'none'
+          });
+        } else {
+          $('#winner1').hide();
+          $('#winner2').show();
+          $('#moveButton').css({
+            display: 'none'
+          });
+          $('#passButton').css({
+            display: 'none'
+          });
+        }
+
       })
       .catch(function(err) {
         console.log(err.message);
@@ -284,5 +346,12 @@ App = {
 $(function() {
   $(window).load(function() {
     App.init();
+    $('#invalidMove').hide();
+    $('#winner1').hide();
+    $('#winner2').hide();
+    $("#noGameSelected").show();
+    $('.close').click(function() {
+       $('#noGameSelected').hide();
+    })
   });
 });
