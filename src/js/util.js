@@ -99,6 +99,13 @@ $('.nav-item').on('click', this, function(event) {
   if (text == 'Home') {
 
   } else if (text == 'Game') {
+    console.log(selectedGameAddress);
+    if (selectedGameAddress == undefined) {
+      $("#noGameSelected").show();
+      $('.close').click(function() {
+         $('#noGameSelected').hide();
+      })
+    }
 
   } else if (text == 'New game') {
 

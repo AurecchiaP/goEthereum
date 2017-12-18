@@ -11,7 +11,7 @@
   <!-- Bootstrap -->
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <link href="css/stylesheet.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
 
   <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -51,25 +51,27 @@
 
     <!-- ---------------------------- GAME -------------------------------- -->
     <div class="tab-pane" id="profile" role="tabpanel">
-      <div class="container centerContent">
-        <div id="winner1" class="alert alert-success" >
+      <div class="container centerContent" >
+        <!-- Notifications -->
+        <div id="winner1" class="alert alert-success" aria-hidden="true" >
           <strong>Congratulations!</strong> Player 1 has won the game.
         </div>
-        <div id="winner2" class="alert alert-success" >
+        <div id="winner2" class="alert alert-success" aria-hidden="true" >
           <strong>Congratulations!</strong> Player 2 has won the game.
         </div>
+        <div id="invalidMove" class="alert alert-danger alert-dismissable fade-in" >
+          <a href="#" class="close"  aria-hidden="true" aria-label="close">&times;</a>
+          <strong>Invalid Move!</strong> A stone has already been placed in that position.
+        </div>
+        <div id="noGameSelected" class="alert alert-warning alert-dismissable fade-in" >
+          <a href="#" class="close" aria-hidden="true" aria-label="close">&times;</a>
+          <strong>Warning!</strong> No Game Selected.
+        </div>
+        <!-- The board -->
         <div id="board">
           <div id="hoverStone" class="stone blue"></div>
           <div id="placedStone" class="stone blue"></div>
           <!-- FILLED IN BY UTIL.JS -->
-        </div>
-        <div id="invalidMove" class="alert alert-danger alert-dismissable fade in" >
-          <a href="#" class="close" aria-label="close">&times;</a>
-          <strong>Invalid Move!</strong> A stone has already been placed in that position.
-        </div>
-        <div id="noGameSelected" class="alert alert-warning alert-dismissable fade in" >
-          <a href="#" class="close" aria-label="close">&times;</a>
-          <strong>Warning!</strong> No Game Selected.
         </div>
         <div>
           <input id="moveButton" class="btn btn-primary" disabled type="button" value="Confirm move">

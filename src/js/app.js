@@ -188,21 +188,13 @@ App = {
           if (gamesData[index][3] == 1) {
             console.log("the winner is player 1");
             $("#winner1").show();
-            $('#moveButton').css({
-              display: 'none'
-            });
-            $('#passButton').css({
-              display: 'none'
-            });
+            $('#moveButton').fadeOut('fast');
+            $('#passButton').fadeOut('fast');
           } else if (gamesData[index][3] == 2) {
             console.log("the winner is player 2");
             $("#winner2").show();
-            $('#moveButton').css({
-              display: 'none'
-            });
-            $('#passButton').css({
-              display: 'none'
-            });
+            $('#moveButton').fadeOut('fast');
+            $('#passButton').fadeOut('fast');
           }
           $('#loader').fadeToggle('fast');
         })
@@ -308,30 +300,18 @@ App = {
         if (gamesData[index][3] == 0) {
           $('#winner1').hide();
           $('#winner2').hide();
-          $('#moveButton').css({
-            display: 'inline-block'
-          });
-          $('#passButton').css({
-            display: 'inline-block'
-          });
+          $('#moveButton').fadeIn('fast');
+          $('#passButton').fadeIn('fast');
         } else if (gamesData[index][3] == 1) {
           $('#winner1').show();
           $('#winner2').hide();
-          $('#moveButton').css({
-            display: 'none'
-          });
-          $('#passButton').css({
-            display: 'none'
-          });
+          $('#moveButton').fadeOut('fast');
+          $('#passButton').fadeOut('fast');
         } else {
           $('#winner1').hide();
           $('#winner2').show();
-          $('#moveButton').css({
-            display: 'none'
-          });
-          $('#passButton').css({
-            display: 'none'
-          });
+          $('#moveButton').fadeOut('fast');
+          $('#passButton').fadeOut('fast');
         }
 
       })
@@ -346,12 +326,5 @@ App = {
 $(function() {
   $(window).load(function() {
     App.init();
-    $('#invalidMove').hide();
-    $('#winner1').hide();
-    $('#winner2').hide();
-    $("#noGameSelected").show();
-    $('.close').click(function() {
-       $('#noGameSelected').hide();
-    })
   });
 });
