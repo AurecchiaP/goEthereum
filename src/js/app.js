@@ -75,7 +75,7 @@ App = {
       for (let j = 0; j < 19; j++) {
         let stone;
         if (board.data[i * 19 + j].c[0] == 1) {
-          stone = $('<div class="stone white temporary-stone" id="stone' + (i * 19 + j) + '"></div>');
+          stone = $('<div class="stone black temporary-stone" id="stone' + (i * 19 + j) + '"></div>');
           stone.css({
             display: 'none',
             top: i / 19 * 100 + '%',
@@ -84,7 +84,7 @@ App = {
           boardDiv.append(stone);
           stone.fadeToggle('fast');
         } else if (board.data[i * 19 + j].c[0] == 2) {
-          stone = $('<div class="stone black temporary-stone" id="stone' + (i * 19 + j) + '"></div>');
+          stone = $('<div class="stone white temporary-stone" id="stone' + (i * 19 + j) + '"></div>');
           stone.css({
             display: 'none',
             top: i / 19 * 100 + '%',

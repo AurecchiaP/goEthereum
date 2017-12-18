@@ -11,6 +11,7 @@
   <!-- Bootstrap -->
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <link href="css/stylesheet.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
   <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
 
   <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -45,7 +46,23 @@
     <div class="tab-pane active" id="home" role="tabpanel">
       <div class="container centerContent">
         <h1>Welcome to goEthereum</h1>
-        <p>go game that uses smart contracts</p>
+        <p>A simplified Go game built on Ethereurm</p>
+        <div id="rules">
+          <h2>The Rules:</h2>
+          <ol>
+            <li>Each player can have stones of only one color (white or black).</li>
+            <li>Each player takes turns to place a stone on the intersections of the lines of the board.</li>
+            <li>A stone has liberties if it is not completely surrounded by the oponent's stones.</li>
+            <li>A player can pass their turn.</li>
+            <li>Two consecutive passes (once by each player) ends the game.</li>
+            <li>The player with more stones on the board wins the game.</li>
+            <li>A players stones can be captured if it has no liberties. </li>
+            <li>Multiple stones can be captured in one go.</li>
+            <li>A stone may not be placed on top of another stone.</li>
+            <li>The game starts with the black stone's turn.</li>
+          </ol>
+        </div>
+
       </div>
     </div>
 
@@ -63,9 +80,9 @@
           <a href="#" class="close"  aria-hidden="true" aria-label="close">&times;</a>
           <strong>Invalid Move!</strong> A stone has already been placed in that position.
         </div>
-        <div id="noGameSelected" class="alert alert-warning alert-dismissable fade-in" >
+        <div id="noGameSelected" class="alert alert-warning  alert-dismissable fade-in" >
           <a href="#" class="close" aria-hidden="true" aria-label="close">&times;</a>
-          <strong>Warning!</strong> No Game Selected.
+          <strong>No Game Selected!</strong> Please select a game from the list of games or create a new game in order to play.
         </div>
         <!-- The board -->
         <div id="board">
@@ -83,7 +100,7 @@
     <!-- -------------------------- NEW GAME ------------------------------ -->
     <div class="tab-pane" id="messages" role="tabpanel">
       <div class="container centerContent">
-        create a new game
+        Create a New Game
         <input id="newGameButton" class="btn btn-primary" type="button" value="New game">
       </div>
     </div>
@@ -91,7 +108,7 @@
     <!-- -------------------------- GAMES LIST ---------------------------- -->
     <div class="tab-pane" id="settings" role="tabpanel">
       <div class="container centerContent">
-        <p>List of games:</p>
+        <p>List of Games:</p>
         <div class="list-group" id="gamesList">
         </div>
       </div>

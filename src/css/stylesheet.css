@@ -2,6 +2,12 @@ body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
+  font-family: 'Roboto', sans-serif;
+
+}
+
+h1 {
+  font-size: 5em;
 }
 
 #board {
@@ -13,6 +19,12 @@ body {
   padding: 0;
   margin: 1em;
   cursor: pointer;
+}
+.close{
+  padding-left: 15px;
+}
+#rules{
+  padding-top: 3.5vw;
 }
 
 .centerContent {
