@@ -35,7 +35,6 @@ App = {
   },
 
   bindEvents: function() {
-    // TODO maybe better to put the event on the button itself?
     $(document).on('click', '#moveButton', App.handleMove);
     $(document).on('click', '#passButton', App.handlePass);
     $(document).on('click', '#newGameButton', App.handleNewGame);
@@ -104,7 +103,6 @@ App = {
     event.preventDefault();
 
     // get the current position of the stone
-    // console.log(placedStone.x);
     var pos = placedStone.x + 19 * placedStone.y;
 
     if (board.data[pos]!= 0) {
@@ -115,8 +113,6 @@ App = {
       console.log("A stone has already been placed in this spot")
       return;
     }
-    // TODO check if a stone is captured - server side
-
     // when you click confirm, it should store the right number at that position
 
     if (!selectedGameAddress) {
@@ -165,7 +161,6 @@ App = {
     $('#loader').fadeToggle('fast');
 
     if (!selectedGameAddress) {
-      console.log("no selected game");
       $('#loader').fadeToggle('fast');
       $("#noGameSelected").show();
       $('.close').click(function() {
@@ -183,15 +178,11 @@ App = {
 
       App.contracts.Games[index].pass()
         .then(function(res) {
-          console.log('passed');
-          console.log(res);
           if (gamesData[index][3] == 1) {
-            console.log("the winner is player 1");
             $("#winner1").show();
             $('#moveButton').fadeOut('fast');
             $('#passButton').fadeOut('fast');
           } else if (gamesData[index][3] == 2) {
-            console.log("the winner is player 2");
             $("#winner2").show();
             $('#moveButton').fadeOut('fast');
             $('#passButton').fadeOut('fast');
@@ -268,7 +259,6 @@ App = {
                 App.contracts.Games[i].getData.call()
                   .then(function(res) {
                     board.turn = res[2].c[0];
-                    console.log(board.turn)
                     gamesData[i] = res;
                     App.selectGame(i);
                   })

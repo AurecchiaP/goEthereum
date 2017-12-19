@@ -25,7 +25,6 @@ var boardDiv = $('#board');
 var placedStone = new Stone(-1, -1, 'white');
 
 // create an empty array for the board 19x19
-//TODO maybe make this into a session object? ugly
 var board = new Board([], 0);
 var gamesList = [];
 var gamesData = [];
@@ -33,7 +32,6 @@ var selectedGameElement, selectedGameAddress;
 
 // when the cursor hovers the board, show where the stone would be placed
 boardDiv.on('mousemove', this, function() {
-  // FIXME updatesize should be done only when we go on tab Game
   board.updateSize();
 
   let offset = $(this).offset();
@@ -89,7 +87,6 @@ boardDiv.on('click', this, function() {
       placedStone.x = cellX;
       placedStone.y = cellY;
       $('#moveButton').prop('disabled', false);
-      console.log("placed stone: ", placedStone.x, placedStone.y);
     }
   }
 });
@@ -99,7 +96,6 @@ $('.nav-item').on('click', this, function(event) {
   if (text == 'Home') {
 
   } else if (text == 'Game') {
-    console.log(selectedGameAddress);
     if (selectedGameAddress == undefined) {
       $("#noGameSelected").show();
       $('.close').click(function() {
