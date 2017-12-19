@@ -16,39 +16,6 @@ contract GoGame {
 
   function GoGame(address gameOwner) public {
     owner = gameOwner;
-    game.board[ 10 + 19 * 2] = 2;
-    game.board[ 9 + 19 * 2] = 1;
-    game.board[ 9 + 19 * 3] = 2;
-    game.board[ 8 + 19 * 3] = 2;
-    game.board[ 8 + 19 * 2] = 1;
-    game.board[ 8 + 19 * 4] = 1;
-    game.board[ 7 + 19 * 2] = 1;
-    game.board[ 7 + 19 * 4] = 1;
-    game.board[ 7 + 19 * 3] = 2;
-    game.board[ 6 + 19 * 3] = 1;
-    game.board[ 9 + 19 * 4] = 1;
-    game.board[ 10 + 19 * 1] = 1;
-    game.board[ 11 + 19 * 2] = 1;
-    game.board[ 11 + 19 * 3] = 1;
-    game.board[ 11 + 19 * 4] = 1;
-    game.board[ 10 + 19 * 3] = 2;
-    game.board[ 10 + 19 * 4] = 2;
-
-    game.board[ 11 + 19 * 5] = 1;
-    game.board[ 10 + 19 * 5] = 2;
-    game.board[ 9 + 19 * 5] = 1;
-
-    game.board[ 11 + 19 * 6] = 1;
-    game.board[ 10 + 19 * 6] = 2;
-    game.board[ 9 + 19 * 6] = 1;
-
-    game.board[ 11 + 19 * 7] = 1;
-    game.board[ 10 + 19 * 7] = 2;
-    game.board[ 9 + 19 * 7] = 1;
-
-    game.board[ 11 + 19 * 8] = 1;
-    game.board[ 10 + 19 * 8] = 2;
-    game.board[ 9 + 19 * 8] = 1;
   }
 
   /* handles the passing of a turn of a player */
