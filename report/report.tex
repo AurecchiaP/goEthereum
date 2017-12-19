@@ -87,18 +87,19 @@ Go is a strategy board game that was first invented more than 2500 years ago
 in China: it then became popular also in other countries such as Korea and Japan,
 and it developed different rules over the course of time.
 Nowadays Go is known and played world-wide, even though the majority of players
-still reside in Asia. While it is an essentially simple game to learn, it is also
+still reside in Asia. While it is essentially a simple game to learn, it is
 very difficult to master, as the tree of possible moves that the players can take
 can quickly become huge.
 
 \subsection{How does the game work?}
-The game is played by two opponents, black and white, which take turns placing
-tokens -- called ``stones'' -- on a 19 by 19 board. The black player plays first,
-and both players are allowed to pass their turns whenever they want.
-When the two players pass their turns consecutively, the game ends.
+Go is a two player game, with each player having tokens called stones of one
+color (black or white). Players take turns to place their tokens on the
+intersections of the lines on the board.
+ The black player plays first, and both players are allowed to pass their turns
+ whenever they want. When the two players pass their turns consecutively, the game ends.
 
 The objective of the game is to capture more area on the board than the opponent,
-by surrounding it with our stones.  (concepts of liberty, chain?)
+by surrounding it with our stones.
 
 \section{Implementation}
 
@@ -118,30 +119,28 @@ The contracts are written using the language Solidity.
 
 We have two contracts: {\ttfamily Go.sol} and {\ttfamily GoGame.sol}. {\ttfamily Go.sol}
 is a contract that is always deployed: it is unique, and it acts as a ``Factory''
- for the go games: when the user wants to create a new game, a method of {\ttfamily Go.sol}
+ for the Go games: when the user wants to create a new game, a method of {\ttfamily Go.sol}
  will be called, that then creates a new instance of {\ttfamily GoGame.sol} and adds it
  to its list of existing games.
 
- {\ttfamily GoGame.sol} represents a single go game: it keeps track of the of
+ {\ttfamily GoGame.sol} represents a single Go game: it keeps track of
  the board, the players and the state of the game. When a player makes a move,
 its validity is checked directly on the contract, so that we ensure the fairness
-of the game. If the move turns out to be valid, Difficult to use with applications that require fast replies, as we have to wait for blocks to be mined
-Difficult to debug
-New technologies - lack of documentation and sometimes limited features
-Code needs to be optimised in order to reduce gas pricethe state of the game gets
-updated (we update the board accordingly and we change the turn of the player).
+of the game. If the move turns out to be valid, the state of the game gets updated
+(we update the board accordingly and we change the turn of the player).
 
 If instead of making a move the player passes the turn, it is again checked on the
 contract if it is valid. If that is the case, we update the turn of the game,
-and if it was the second consecutive pass, the game ends, in which case
-the contract calculates who the winner is and stores that in the contract.
+and if it was the second consecutive pass (both players pass one after the other),
+ the game ends, in which case the contract calculates who the winner is and
+ stores that in the contract.
 
 \section{Using BlockChain}
 
 \subsection{Benefits}
 The main benefit of developing such a game using smart contracts and BlockChain
 is the possibility to ensure the fairness of the game, since the logic and the
-validity of the moves is checked on the contract. This would not be possible if
+validity of the moves are checked on the contract. This would not be possible if
 we were to implement the game using a normal client-server approach.
 
 Another advantage is that we do not depend on the availability and reliability
