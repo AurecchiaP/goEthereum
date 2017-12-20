@@ -1,29 +1,34 @@
 pragma solidity 0.4.18;
 
 contract GoGame {
-  address public owner;
-  address public opponent;
+  address public owner; // the user that created the game
+  address public opponent; // the user that joined the game once it was created
 
   struct Game {
-      uint8[361] board;
+      uint8[361] board; // entries are 0 if empty, 1 or 2 if occupied by stones
       uint8 state; // 0: ongoing, 1: owner won, 2: opponent won
-      uint8 turn;  // 0: owner has to move, 1: opponent has to move
+      uint8 turn; // 0: owner has to move, 1: opponent has to move
       bool ownerPassed; // 0 if not passed, 1 if it has passed last turn
       bool opponentPassed; // 0 if not passed, 1 if it has passed last turn
   }
 
   Game game;
 
+  /* constructor of the GoGame instance. the owner gets passed as a parameter,
+     because since this is called directly from contract Go.sol, in this case
+     msg.sender would be the address of the Go.sol contract. */
   function GoGame(address gameOwner) public {
     owner = gameOwner;
   }
 
   /* handles the passing of a turn of a player */
   function pass() public {
-    /* bool player2won = false; */
+    /* if it's the first turn of the opponent, save his address */
     if (msg.sender != owner && opponent == 0) {
       opponent = msg.sender;
     }
+
+    /* update the state of the game after the pass */
     if (game.turn == 0 && owner == msg.sender) {
       game.ownerPassed = true;
       game.turn = (game.turn + 1) % 2;
@@ -34,6 +39,7 @@ contract GoGame {
       game.turn = (game.turn + 1) % 2;
     }
 
+    /* if both players passed consecutively, the game ends */
     if (game.ownerPassed && game.opponentPassed) {
       checkSimpleWinner();
     }
@@ -42,12 +48,16 @@ contract GoGame {
   /* handles the move of a player */
   function move(uint16 pos) public {
     bool liberty = false;
+
+    /* if the game's done, invalid move */
     if (game.state != 0) {
       return;
     }
+    /* if the postion is already occupied by a stone, invalid move */
     if (game.board[pos] != 0){
       return;
     }
+    /* make sure that the position is valid for the board */
     if(pos > 18 && game.board[pos - 19] == 0 ) {
       liberty = true;
     } else if (pos < 342 && game.board[pos + 19] == 0) {
@@ -62,15 +72,19 @@ contract GoGame {
       return;
     }
 
+    /* if it's the first turn of the opponent, save his address */
     if (msg.sender != owner && opponent == 0) {
       opponent = msg.sender;
     }
 
+    /* if it's the turn of the player that made the move, update the state
+    of the game */
     if (game.turn == 0 && owner == msg.sender) {
       game.turn = game.turn + 1;
       game.board[pos] = game.turn;
       game.turn = game.turn % 2;
       game.ownerPassed = false;
+      /* check if this move capture enemy stones */
       checkNeighbors(pos);
     } else if (game.turn == 1 && opponent == msg.sender) {
       game.turn = game.turn + 1;
@@ -106,7 +120,9 @@ contract GoGame {
     }
   }
 
-  /* returns the current board of the game */
+  /* checks if starting from 'position', there is a chain of player 'color'.
+     If that is the case, we also check if the chain has liberties, and if it
+     doesn't have any it gets captured and removed from the board. */
   function check(uint16 position, uint8 color) private {
     if (game.board[position] == color) {
       uint16[361] memory visited;
